@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&amp;family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&amp;display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #FAF9F7; }
+  * { box-sizing: border-box; }
+  a { color: #101010; text-decoration: none; }
+  a:hover { color: #101010; text-decoration: underline; text-underline-offset: 3px; }
+  ::selection { background: #101010; color: #FAF9F7; }
+  .news-slider::-webkit-scrollbar { display: none; }
+  input, textarea, select, button { font-family: inherit; }
+</style>
+</helmet>
+<div onClick="{{ onClick }}" style="min-height: 100vh; background: #FAF9F7; color: #101010; font-family: Archivo, system-ui, sans-serif; -webkit-font-smoothing: antialiased;">
+
+  <header ref="{{ headerRef }}" style="position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: {{ headerBg }}; backdrop-filter: {{ headerBlur }}; border-bottom: 1px solid {{ headerBorder }}; transition: background 0.2s, border-color 0.2s;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; align-items: center; min-height: 76px;">
+      <div style="display: flex; align-items: center; gap: clamp(8px, 1.2vw, 14px); min-width: 0; padding: 12px 0 12px clamp(20px, 2.8vw, 40px);">
+        <a href="#/" data-href="/" style="display: flex; align-items: center; gap: 10px; text-decoration: none; flex: 0 1 auto; min-width: 0; overflow: hidden;">
+          <span style="font: 600 clamp(12px, 1.05vw, 15px)/1 Archivo; letter-spacing: 0.05em; border: 1px dashed {{ logoBorder }}; padding: 10px clamp(10px, 1.3vw, 18px); color: {{ logoFg }}; white-space: nowrap; transition: color 0.2s, border-color 0.2s;">LOGO</span>
+        </a>
+        <sc-if value="{{ showBadge }}">
+          <div style="display: flex; align-items: center; gap: clamp(8px, 1vw, 12px); min-width: 0; flex: none;">
+            <span style="width: 1px; height: 22px; background: #DEDBD6; display: block; flex: none;"></span>
+            <a href="#{{ instHref }}" data-href="{{ instHref }}" style="font: 500 9px/1 Archivo; letter-spacing: 0.14em; text-transform: uppercase; color: #6E6B67; border: 1px solid #DEDBD6; padding: 4px 7px; flex: none; text-decoration: none;">{{ instKind }}</a>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showZglNav }}" hint-placeholder-val="{{ true }}">
+          <a href="#/zgloszenia" data-href="/zgloszenia" style="margin-left: auto; font: 500 clamp(10px, 0.86vw, 12px)/1 Archivo; letter-spacing: 0.08em; text-transform: uppercase; padding: 11px clamp(7px, 0.85vw, 14px); text-decoration: none; white-space: nowrap; color: {{ zglNavFg }}; border-bottom: 2px solid {{ zglNavRule }}; flex: none;" style-hover="color: #101010; text-decoration: none;">Zgłoszenia</a>
+        </sc-if>
+        <button onClick="{{ toggleMega }}" style="margin-left: {{ megaBtnMl }}; font: 500 clamp(10px, 0.86vw, 12px)/1 Archivo; letter-spacing: 0.08em; text-transform: uppercase; padding: 11px clamp(8px, 1.05vw, 14px); border: 1px solid {{ placowkiBorder }}; background: {{ megaBg }}; color: {{ placowkiFg }}; cursor: pointer; display: flex; align-items: center; gap: clamp(5px, 0.6vw, 8px); flex: 0 1 auto; min-width: 0; overflow: hidden; transition: color 0.2s, border-color 0.2s;">
+          <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Placówki</span>
+          <span style="font-size: 9px; display: inline-block; transform: {{ megaCaret }};">▼</span>
+        </button>
+      </div>
+
+      <nav style="display: flex; align-items: center; justify-content: flex-end; flex-wrap: nowrap; min-width: 0; overflow: hidden; padding: 12px clamp(20px, 2.8vw, 40px) 12px clamp(10px, 1.5vw, 20px);">
+        <sc-if value="{{ wideNav }}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; align-items: center; flex-wrap: nowrap; justify-content: flex-end; gap: clamp(0px, 0.3vw, 4px); min-width: 0;">
+            <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="5">
+              <a href="#{{ item.href }}" data-href="{{ item.href }}" style="font: 500 clamp(10px, 0.86vw, 12px)/1 Archivo; letter-spacing: 0.08em; text-transform: uppercase; padding: 11px clamp(7px, 0.85vw, 14px); text-decoration: none; white-space: nowrap; color: {{ item.fg }}; border-bottom: 2px solid {{ item.rule }};" style-hover="color: #101010;">{{ item.label }}</a>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ narrowNav }}">
+          <button onClick="{{ toggleBurger }}" aria-label="Menu" style="display: flex; flex-direction: column; justify-content: center; gap: 5px; width: 48px; height: 44px; padding: 0 12px; border: 1px solid {{ burgerBorderT }}; background: {{ burgerBg }}; cursor: pointer; flex: none; transition: border-color 0.2s;">
+            <span style="display: block; height: 1.5px; width: 100%; background: {{ burgerFgT }}; transition: background 0.2s;"></span>
+            <span style="display: block; height: 1.5px; width: 100%; background: {{ burgerFgT }}; transition: background 0.2s;"></span>
+            <span style="display: block; height: 1.5px; width: 100%; background: {{ burgerFgT }}; transition: background 0.2s;"></span>
+          </button>
+        </sc-if>
+      </nav>
+    </div>
+
+    <sc-if value="{{ burger }}">
+      <div style="position: absolute; top: 100%; left: 0; right: 0; border-top: 1px solid #DEDBD6; background: #F2F0EC; display: grid; grid-template-columns: 1fr 1fr; box-shadow: 0 12px 24px rgba(0,0,0,0.08);">
+        <div></div>
+        <div style="display: grid; border-left: 1px solid #DEDBD6;">
+          <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="5">
+            <a href="#{{ item.href }}" data-href="{{ item.href }}" style="font: 500 12px/1 Archivo; letter-spacing: 0.1em; text-transform: uppercase; padding: 18px clamp(20px, 2.8vw, 40px); text-decoration: none; text-align: right; color: {{ item.fg }}; border-bottom: 1px solid #DEDBD6;" style-hover="background: #EFEDE9; text-decoration: none;">{{ item.label }}</a>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ mega }}">
+      <div style="position: absolute; top: 100%; left: 0; right: 0; border-top: 1px solid #DEDBD6; background: #F2F0EC; box-shadow: 0 12px 24px rgba(0,0,0,0.08);">
+        <div style="display: grid; grid-template-columns: {{ megaCols }};">
+          <div style="padding: {{ megaPad1 }}; border-bottom: {{ megaDiv }};">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid #DEDBD6; padding-bottom: 12px; margin-bottom: 20px;">
+              <a href="#/poradnie" data-href="/poradnie" style="font: 500 13px/1 Archivo; letter-spacing: 0.14em; text-transform: uppercase;">Poradnie</a>
+              <a href="#/poradnie" data-href="/poradnie" style="font: 400 12px/1 Archivo; color: #6E6B67;">Zobacz wszystkie →</a>
+            </div>
+            <div style="display: grid; gap: 8px;">
+              <sc-for list="{{ poradnie }}" as="p" hint-placeholder-count="2">
+                <a href="#{{ p.href }}" data-href="{{ p.href }}" style="display: grid; gap: 4px; padding: 16px 18px; background: #FAF9F7; border: 1px solid #DEDBD6; text-decoration: none;" style-hover="border-color: #101010; text-decoration: none;">
+                  <span style="font: 500 16px/1.25 Archivo; letter-spacing: -0.015em;">{{ p.name }}</span>
+                  <span style="font: 400 13px/1.4 Archivo; color: #6E6B67;">{{ p.addr }}</span>
+                </a>
+              </sc-for>
+            </div>
+          </div>
+          <div style="padding: {{ megaPad2 }}; border-left: {{ megaDivL }};">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid #DEDBD6; padding-bottom: 12px; margin-bottom: 20px;">
+              <a href="#/oddzialy" data-href="/oddzialy" style="font: 500 13px/1 Archivo; letter-spacing: 0.14em; text-transform: uppercase;">Oddziały</a>
+              <a href="#/oddzialy" data-href="/oddzialy" style="font: 400 12px/1 Archivo; color: #6E6B67;">Zobacz wszystkie →</a>
+            </div>
+            <div style="display: grid; gap: 8px;">
+              <sc-for list="{{ oddzialy }}" as="o" hint-placeholder-count="2">
+                <a href="#{{ o.href }}" data-href="{{ o.href }}" style="display: grid; gap: 4px; padding: 16px 18px; background: #FAF9F7; border: 1px solid #DEDBD6; text-decoration: none;" style-hover="border-color: #101010; text-decoration: none;">
+                  <span style="font: 500 16px/1.25 Archivo; letter-spacing: -0.015em;">{{ o.name }}</span>
+                  <span style="font: 400 13px/1.4 Archivo; color: #6E6B67;">{{ o.addr }}</span>
+                </a>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showCrumbs }}">
+      <div style="position: relative; border-top: 1px solid #DEDBD6; background: #FAF9F7;">
+        <div style="padding: 0 40px; height: 42px; display: flex; align-items: center; gap: 10px; overflow: hidden;">
+          <sc-for list="{{ crumbs }}" as="c" hint-placeholder-count="3">
+            <a href="#{{ c.href }}" data-href="{{ c.href }}" style="font: 400 12px/1 Archivo; letter-spacing: 0.02em; color: {{ c.fg }}; white-space: nowrap;">{{ c.label }}</a>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+  </header>
+
+  <main style="width: 100%; padding-top: {{ mainPadTop }};">
+
+    <sc-if value="{{ pHome }}" hint-placeholder-val="{{ true }}">
+      <div style="padding: 0 40px;">
+        <section style="margin: 0 -40px; display: grid; grid-template-columns: 1fr 1fr; min-height: {{ heroMinH }}; border-bottom: 1px solid #DEDBD6;">
+          <div style="display: grid; align-content: center; padding: {{ heroPadTop }} max(48px, 4vw) max(56px, 9vh) 40px;">
+            <div style="font: 500 11px/1 Archivo; letter-spacing: 0.18em; text-transform: uppercase; color: #8A8681; margin-bottom: min(4vh, 32px);">[nadtytuł]</div>
+            <h1 style="margin: 0 0 min(4vh, 32px); font: 500 clamp(44px, min(6.8vw, 13vh), 112px)/0.94 Archivo; letter-spacing: -0.045em; text-wrap: balance;">Nagłówek 1</h1>
+            <p style="margin: 0; max-width: 46ch; font: 300 clamp(17px, min(1.55vw, 2.7vh), 23px)/1.5 Newsreader, Georgia, serif; color: #35322E; text-wrap: pretty;">[paragraf 1] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. [paragraf 1]</p>
+            <div style="display: flex; gap: 12px; margin-top: min(5vh, 44px); flex-wrap: wrap;">
+              <a href="#/poradnie" data-href="/poradnie" style="font: 500 12px/1 Archivo; letter-spacing: 0.08em; text-transform: uppercase; padding: 17px 26px; background: #101010; color: #FAF9F7; text-decoration: none;" style-hover="background: #35322E; text-decoration: none;">Poradnie CTA</a>
+              <a href="#/oddzialy" data-href="/oddzialy" style="font: 500 12px/1 Archivo; letter-spacing: 0.08em; text-transform: uppercase; padding: 17px 26px; border: 1px solid #101010; text-decoration: none;" style-hover="background: #EFEDE9; text-decoration: none;">Oddziały CTA</a>
+            </div>
+          </div>
+          <div style="position: relative; height: 100%; background: #6E6B67; border-left: 1px solid #5B584F; display: flex; align-items: flex-end; padding: 28px 40px; overflow: hidden;">
+            <svg viewBox="0 0 628 628" fill="#FFFFFF" xmlns="http://www.w3.org/2000/svg" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(16vw, 28vh); height: min(16vw, 28vh);"><path d="M400.669 262.484L282.919 183.984C280.701 182.505 278.122 181.655 275.459 181.527C272.796 181.398 270.148 181.995 267.798 183.255C265.447 184.514 263.483 186.389 262.116 188.677C260.748 190.966 260.027 193.584 260.031 196.25V353.25C260.027 355.916 260.748 358.534 262.116 360.823C263.483 363.111 265.447 364.986 267.798 366.245C270.148 367.505 272.796 368.102 275.459 367.974C278.122 367.845 280.701 366.995 282.919 365.516L400.669 287.016C402.693 285.673 404.353 283.85 405.502 281.71C406.65 279.57 407.252 277.179 407.252 274.75C407.252 272.321 406.65 269.93 405.502 267.79C404.353 265.65 402.693 263.827 400.669 262.484ZM289.469 325.75V223.75L365.957 274.75L289.469 325.75ZM529.875 103.031H98.125C89.0165 103.031 80.281 106.65 73.8403 113.09C67.3996 119.531 63.7813 128.266 63.7812 137.375V412.125C63.7812 421.234 67.3996 429.969 73.8403 436.41C80.281 442.85 89.0165 446.469 98.125 446.469H529.875C538.984 446.469 547.719 442.85 554.16 436.41C560.6 429.969 564.219 421.234 564.219 412.125V137.375C564.219 128.266 560.6 119.531 554.16 113.09C547.719 106.65 538.984 103.031 529.875 103.031ZM534.781 412.125C534.781 413.426 534.264 414.674 533.344 415.594C532.424 416.514 531.176 417.031 529.875 417.031H98.125C96.8238 417.031 95.5759 416.514 94.6558 415.594C93.7357 414.674 93.2188 413.426 93.2188 412.125V137.375C93.2188 136.074 93.7357 134.826 94.6558 133.906C95.5759 132.986 96.8238 132.469 98.125 132.469H529.875C531.176 132.469 532.424 132.986 533.344 133.906C534.264 134.826 534.781 136.074 534.781 137.375V412.125ZM564.219 510.25C564.219 514.154 562.668 517.897 559.908 520.658C557.147 523.418 553.404 524.969 549.5 524.969H78.5C74.5963 524.969 70.8526 523.418 68.0923 520.658C65.332 517.897 63.7812 514.154 63.7812 510.25C63.7812 506.346 65.332 502.603 68.0923 499.842C70.8526 497.082 74.5963 495.531 78.5 495.531H549.5C553.404 495.531 557.147 497.082 559.908 499.842C562.668 502.603 564.219 506.346 564.219 510.25Z"></path></svg>
+            <span style="position: relative; font: 400 10px/1.4 Archivo; letter-spacing: 0.14em; text-transform: uppercase; color: #E4E1DC;">Wideo — materiał otwierający</span>
+          </div>
+        </section>
+
+        <section style="margin: 0 -40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); grid-auto-rows: minmax(min-content, auto); min-height: 100vh; border-bottom: 1px solid #DEDBD6;">
+          <div style="position: relative; min-height: min(50vw, 52vh); background: #6E6B67; border-right: 1px solid #5B584F; display: flex; align-items: flex-end; padding: 28px 40px; overflow: hidden;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(13vw, 24vh); height: min(13vw, 24vh);"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.4"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            <span style="position: relative; font: 400 10px/1.4 Archivo; letter-spacing: 0.14em; text-transform: uppercase; color: #E4E1DC;">Zdjęcie — archiwum Effatha</span>
+          </div>
+          <div style="display: grid; align-content: center; gap: min(2.2vh, 20px); padding: max(56px, 9vh) 40px max(56px, 9vh) max(48px, 4vw);">
+            <div style="font: 500 11px/1 Archivo; letter-spacing: 0.18em; text-transform: uppercase; color: #8A8681;">Historia</div>
+            <h3 style="margin: 0; font: 500 clamp(30px, min(3.6vw, 7vh), 60px)/1.04 Archivo; letter-spacing: -0.035em; text-wrap: balance;">Nagłówek 3</h3>
+            <p style="margin: 0; max-width: 46ch; font: 300 clamp(17px, min(1.5vw, 2.6vh), 22px)/1.5 Newsreader, Georgia, serif; color: #35322E; text-wrap: pretty;">[paragraf 1] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. [paragraf 1]</p>
+            <a href="#/historia" data-href="/historia" style="font: 500 12px/1 Archivo; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 8px; justify-self: start;">Poznaj historię →</a>
+          </div>
+        </section>
+
+        <section style="margin: 0 -40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); grid-auto-rows: minmax(min-content, auto); min-height: 100vh; border-bottom: 1px solid #DEDBD6;">
+          <div style="display: grid; align-content: center; gap: min(2.2vh, 20px); padding: max(56px, 9vh) max(48px, 4vw) max(56px, 9vh) 40px;">
+            <div style="font: 500 11px/1 Archivo; letter-spacing: 0.18em; text-transform: uppercase; color: #8A8681;">Zespół</div>
+            <h3 style="margin: 0; font: 500 clamp(30px, min(3.6vw, 7vh), 60px)/1.04 Archivo; letter-spacing: -0.035em; text-wrap: balance;">{{ zesName }}</h3>
+            <span style="font: 400 clamp(13px, 1.1vw, 15px)/1.3 Archivo; letter-spacing: 0.02em; color: #6E6B67;">{{ zesRole }}</span>
+            <p style="margin: 0; max-width: 46ch; font: 300 clamp(17px, min(1.5vw, 2.6vh), 22px)/1.5 Newsreader, Georgia, serif; color: #35322E; text-wrap: pretty;">[paragraf 1] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. [paragraf 1]</p>
+            <a href="#/zespol" data-href="/zespol" style="font: 500 12px/1 Archivo; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 8px; justify-self: start;">Zobacz zespół →</a>
+            <div style="display: flex; gap: clamp(6px, 0.8vw, 12px); margin-top: min(3vh, 28px);">
+              <sc-for list="{{ zesSegs }}" as="s" hint-placeholder-count="5">
+                <button onClick="{{ s.onClick }}" aria-label="{{ s.label }}" style="flex: 1 1 0; min-width: 0; padding: 14px 0; border: 0; background: transparent; cursor: pointer; display: block;">
+                  <span style="display: block; height: 3px; background: {{ s.bg }};"></span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          <button onClick="{{ nextZes }}" aria-label="Następna osoba" style="position: relative; min-height: min(50vw, 52vh); background: #6E6B67; border: 0; border-left: 1px solid #5B584F; display: flex; align-items: flex-end; padding: 28px 40px; overflow: hidden; cursor: pointer; text-align: left;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(13vw, 24vh); height: min(13vw, 24vh);"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.4"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            <span style="position: relative; font: 400 10px/1.4 Archivo; letter-spacing: 0.14em; text-transform: uppercase; color: #E4E1DC;">Zdjęcie — {{ zesName }}</span>
+          </button>
+        </section>
+
+        <section style="position: relative; margin: 0 -40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); grid-auto-rows: minmax(min-content, auto); min-height: 100vh; border-bottom: 1px solid #DEDBD6;">
+          <div aria-hidden="true" style="position: absolute; left: 50%; top: max(56px, 9vh); bottom: max(56px, 9vh); width: 1px; margin-left: -0.5px; background: #DEDBD6; pointer-events: none; display: {{ startLineDisp }};"></div>
+          <div style="display: grid; align-content: center; gap: clamp(20px, 3.4vh, 40px); padding: max(56px, 9vh) max(48px, 4vw) max(56px, 9vh) 40px;">
+            <div style="font: 500 11px/1 Archivo; letter-spacing: 0.18em; text-transform: uppercase; color: #8A8681;">{{ startKicker }}</div>
+            <h2 style="margin: 0; font: 500 clamp(30px, min(3.6vw, 7vh), 60px)/1.04 Archivo; letter-spacing: -0.035em; text-wrap: balance;">{{ startTitle }}</h2>
+            <p style="margin: 0; max-width: 44ch; font: 300 clamp(17px, min(1.5vw, 2.6vh), 22px)/1.5 Newsreader, Georgia, serif; color: #35322E; text-wrap: pretty;">{{ startBody }}</p>
+            <a href="#{{ startHref }}" data-href="{{ startHref }}" style="font: 500 12px/1 Archivo; letter-spacing: 0.1em; text-transform: uppercase; margin-top: min(2.4vh, 22px); justify-self: start;">{{ startCta }} →</a>
+          </div>
+          <div style="display: grid; align-content: center; gap: clamp(28px, 4.2vh, 52px); padding: max(56px, 9vh) 40px max(56px, 9vh) max(48px, 4vw);">
+            <sc-for list="{{ startTabs }}" as="t" hint-placeholder-count="4">
+              <button onClick="{{ t.onClick }}" style="width: 100%; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 16px; text-align: left; padding: clamp(16px, 2vh, 24px) clamp(18px, 1.6vw, 26px); cursor: pointer; border: 1px solid {{ t.bc }}; background: {{ t.bg }};" style-hover="border-color: #8A8681;">
+                <span style="font: 400 11px/1 Archivo; letter-spacing: 0.14em; color: #8A8681;">{{ t.num }}</span>
+                <span style="font: 500 clamp(13px, 1.15vw, 15px)/1.35 Archivo; letter-spacing: 0.06em; text-transform: uppercase; color: {{ t.fg }};">{{ t.label }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </section>
+
+        <section style="margin: 0 -40px; padding: 0; border-bottom: 1px solid #DEDBD6;">
+          <div style="background: #FFFFFF;">
+            <button onClick="{{ nextPlac }}" aria-label="Następna placówka" style="display: block; width: 100%; position: relative; height: clamp(240px, 32vw, 480px); padding: 0; border: 0; border-bottom: 1px solid #DEDBD6; cursor: pointer; overflow: hidden; background-color: #E8E6E2; background-image: url('assets/map-mono.png'); background-size: cover; background-position: 50% 50%; background-repeat: no-repeat;">
+              <div style="position: absolute; left: 50%; top: 50%; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 6px rgba(0,0,0,0.18); display: flex; align-items: center; justify-content: center;">
+                <span style="width: 14px; height: 14px; border-radius: 50%; background: #101010; display: block;"></span>
+              </div>
+              <div style="position: absolute; left: 50%; top: 50%; transform: translate(6px, -74px); background: #FFFFFF; border: 1px solid #DEDBD6; box-shadow: 0 2px 10px rgba(0,0,0,0.07); padding: 12px 16px; display: grid; gap: 3px; text-align: left; max-width: min(280px, 44vw);">
+                <span style="font: 400 clamp(12px, 1.05vw, 14px)/1.45 Archivo; color: #101010; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ placAddr }}</span>
+                
+              </div>
+            </button>
+            
+            <div style="position: relative; display: grid; justify-items: center; gap: 14px; padding: clamp(28px, 3.6vw, 56px) clamp(24px, 3.2vw, 56px) clamp(24px, 3vw, 44px); text-align: center;">
+              <span style="font: 500 10px/1 Archivo; letter-spacing: 0.16em; text-transform: uppercase; color: #FAF9F7; background: #6E6B67; padding: 7px 11px; justify-self: start; align-self: start;">{{ placCat }}</span>
+              <a href="#{{ placHref }}" data-href="{{ placHref }}" style="margin: 0; display: inline-flex; align-items: baseline; gap: 0.42em; font: 500 clamp(28px, 3.4vw, 46px)/1.06 Archivo; letter-spacing: -0.035em; color: #101010; text-decoration: none;" style-hover="text-decoration: none; opacity: 0.68;">{{ placName }}<span style="font: 400 0.52em/1 Archivo; color: #6E6B67;">→</span></a>
+              <p style="margin: 0; max-width: 62ch; font: 400 clamp(14px, 1.2vw, 16px)/1.65 Archivo; color: #6E6B67; text-wrap: pretty;">{{ placDesc }}</p>
+            </div>
+            <div style="display: flex; gap: clamp(6px, 0.8vw, 12px); padding: 0 clamp(24px, 3.2vw, 56px) clamp(22px, 2.4vw, 36px);">
+              <sc-for list="{{ placSegs }}" as="s" hint-placeholder-count="4">
+                <button onClick="{{ s.onClick }}" aria-label="{{ s.label }}" style="flex: 1 1 0; min-width: 0; padding: 14px 0; border: 0; background: transparent; cursor: pointer; display: block;">
+                  <span style="display: block; height: 3px; background: {{ s.bg }};"></span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </section>
+
+        <section style="position: relative; margin: 0 calc(50% - 50vw); min-height: 100vh; display: flex; flex-direction: column; overflow: hidden;">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; padding: 64px 0 0 max(40px, calc(50vw - 620px)); position: relative; z-index: 1;">
+            <h2 style="margin: 0; font: 500 clamp(30px, 3.2vw, 44px)/1.02 Archivo; letter-spacing: -0.035em;">Aktualności</h2>
+            <div style="display: grid; justify-items: end; gap: 0;">
+              <a href="#/aktualnosci" data-href="/aktualnosci" style="font: 500 12px/1 Archivo; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 20px; justify-self: center;">Wszystkie wpisy →</a>
+              <div style="display: flex; gap: {{ navBtnGap }};">
+                <button onClick="{{ scrollNewsPrev }}" aria-label="Poprzedni" style="width: {{ navBtnW }}; height: 56px; border: 1px solid #DEDBD6; background: transparent; cursor: pointer; font: 400 18px/1 Archivo;">←</button>
+                <button onClick="{{ scrollNewsNext }}" aria-label="Następny" style="width: {{ navBtnW }}; height: 56px; border: 1px solid #DEDBD6; background: transparent; cursor: pointer; font: 400 18px/1 Archivo;">→</button>
+              </div>
+            </div>
+          </div>
+          <div class="news-slider" ref="{{ newsSliderRef }}" style="flex: 1; display: flex; gap: 28px; overflow-x: auto; padding: 0 0 56px; scrollbar-width: none; position: relative; z-index: 1;">
+            <sc-for list="{{ newsLoop }}" as="n" hint-placeholder-count="4">
+              <a href="#/aktualnosci" data-href="/aktualnosci" style="flex: 0 0 clamp(300px, 38vw, 620px); display: grid; grid-template-rows: auto auto; gap: 20px; text-decoration: none;" style-hover="text-decoration: none;">
+                <div style="width: 100%; min-width: 0; max-width: 100%; aspect-ratio: 1/1; background: #6E6B67; border: 1px solid #5B584F; display: flex; align-items: center; justify-content: center;"><svg width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.4"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
+                <div style="display: grid; gap: 10px;">
+                  <span style="font: 400 12px/1 Archivo; letter-spacing: 0.12em; text-transform: uppercase; color: #8A8681;">{{ n.date }} · {{ n.source }}</span>
+                  <span style="font: 500 26px/1.2 Archivo; letter-spacing: -0.025em; text-wrap: pretty;">{{ n.title }}</span>
+                  <span style="font: 400 15px/1.5 Archivo; color: #6E6B67;">{{ n.lead }}</span>
+                </div>
+              </a>
+            </sc-for>
+          </div>
+        </section>
+
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pHistoria }}">
+      <div style="max-width: 1320px; margin: 0 auto; padding: 0 40px;">
+        <section style="padding: 72px 0 56px; border-bottom: 1px solid #DEDBD6;">
+          <h1 style="margin: 0 0 24px; font: 500 clamp(40px, 5vw, 68px)/1 Archivo; letter-spacing: -0.045em;">Historia</h1>
+          <p style="margin: 0; max-width: 62ch; font: 300 21px/1.55 Newsreader, Georgia, serif; color: #35322E;">[paragraf 1] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. [paragraf 1]</p>
+        </section>
+        <section style="padding: 0 0 64px;">
+          <sc-for list="{{ timelinePanels }}" as="t" hint-placeholder-count="5">
+            <div style="border-bottom: 1px solid #DEDBD6; display: grid; align-items: start; grid-template-columns: {{ t.cols }}; margin-right: {{ t.mr }};">
+              <div style="display: grid; grid-template-rows: auto 1fr; align-items: start; min-width: 0;">
+              <button onClick="{{ t.toggle }}" aria-expanded="{{ t.expanded }}" style="width: 100%; background: none; border: 0; cursor: pointer; text-align: left; font: inherit; color: inherit; display: grid; grid-template-columns: 160px 1fr 28px; gap: 32px; padding: 34px 0; align-items: center;" style-hover="opacity: 0.62;">
+                <span style="font: 500 30px/1 Archivo; letter-spacing: -0.03em; color: #8A8681;">{{ t.year }}</span>
+                <span style="font: 500 21px/1.25 Archivo; letter-spacing: -0.02em;">{{ t.title }}</span>
+                <span style="justify-self: end; width: 12px; height: 12px; position: relative; opacity: {{ t.iconOp }}; transition: opacity 200ms linear;">
+                  <span style="position: absolute; top: 50%; left: 0; width: 12px; height: 1px; background: #101010;"></span>
+                  <span style="position: absolute; top: 50%; left: 0; width: 12px; height: 1px; background: #101010; transform: rotate({{ t.rot }}); transition: transform 260ms cubic-bezier(0.22,0.61,0.36,1);"></span>
+                </span>
+              </button>
+              <sc-if value="{{ t.open }}">
+                <p style="align-self: center; margin: 0 max(48px, 4vw) 34px min(192px, 30%); font: 400 16px/1.6 Archivo; color: #6E6B67; max-width: 46ch; text-wrap: pretty;">{{ t.body }}</p>
+              </sc-if>
+              </div>
+              <sc-if value="{{ t.open }}">
+                <div style="position: relative; width: 100%; aspect-ratio: 1.618 / 1; background: #6E6B67; border: 0; display: flex; align-items: flex-end; padding: 18px;">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 84px; height: 84px;"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.4"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                  <span style="position: relative; font: 400 10px/1.4 Archivo; letter-spacing: 0.14em; text-transform: uppercase; color: #E4E1DC;">Zdjęcie — {{ t.year }}</span>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pZespol }}">
+      <div style="max-width: 1320px; margin: 0 auto; padding: 0 40px;">
+        <section style="margin: 0 calc(50% - 50vw); position: relative; aspect-ratio: 2.8 / 1; min-height: 300px; background: #6E6B67; display: flex; align-items: flex-end; padding: 28px max(40px, 4vw); overflow: hidden;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(11vw, 150px); height: min(11vw, 150px);"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.4"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          <span style="position: relative; font: 400 10px/1.4 Archivo; letter-spacing: 0.14em; text-transform: uppercase; color: #E4E1DC;">Zdjęcie — zespół Effatha</span>
+        </section>
+        <section style="padding: 56px 0;">
+          <p style="margin: 0; max-width: 62ch; font: 300 21px/1.55 Newsreader, Georgia, serif; color: #35322E;">[paragraf 1] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. [paragraf 1]</p>
+        </section>
+        <div style="min-height: calc(100vh - 120px); display: grid; grid-template-rows: auto 1fr;">
+        <div style="margin: 0 calc(50% - 50vw); padding: 0 40px; border-bottom: 1px solid #DEDBD6; overflow-x: auto; overflow-y: hidden;">
+          <div style="display: flex; min-width: min-content;">
+            <sc-for list="{{ zesFilters }}" as="f" hint-placeholder-count="5">
+              <button onClick="{{ f.onClick }}" style="flex: 1 1 auto; text-align: center; font: 500 11px/1 Archivo; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; padding: 22px 26px; border: 0; border-left: {{ f.divider }}; background: transparent; color: {{ f.fg }}; cursor: pointer;" style-hover="color: #101010;">{{ f.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <section style="margin: 0 calc(50% - 50vw); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); grid-auto-rows: minmax(min-content, auto); min-height: 0; border-bottom: 1px solid #DEDBD6;">
+          <div style="display: grid; align-content: center; gap: min(2.2vh, 20px); padding: max(56px, 9vh) max(48px, 4vw) max(56px, 9vh) max(40px, calc(50vw - 620px));">
+            <div style="font: 500 11px/1 Archivo; letter-spacing: 0.18em; text-transform: uppercase; color: #8A8681;">{{ zesPInst }}</div>
+            <h3 style="margin: 0; font: 500 clamp(30px, min(3.6vw, 7vh), 60px)/1.04 Archivo; letter-spacing: -0.035em; text-wrap: balance;">{{ zesPName }}</h3>
+            <span style="font: 400 clamp(13px, 1.1vw, 15px)/1.3 Archivo; letter-spacing: 0.02em; color: #6E6B67;">{{ zesPRole }}</span>
+            <p style="margin: 0; max-width: 46ch; font: 300 clamp(17px, min(1.5vw, 2.6vh), 22px)/1.5 Newsreader, Georgia, serif; color: #35322E; text-wrap: pretty;">[paragraf 1] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. [paragraf 1]</p>
+            <div style="display: flex; gap: clamp(6px, 0.8vw, 12px); margin-top: min(3vh, 28px);">
+              <sc-for list="{{ zesPSegs }}" as="s" hint-placeholder-count="5">
+                <button onClick="{{ s.onClick }}" aria-label="{{ s.label }}" style="flex: 1 1 0; min-width: 0; padding: 14px 0; border: 0; background: transparent; cursor: pointer; display: block;">
+                  <span style="display: block; height: 3px; background: {{ s.bg }};"></span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          <button onClick="{{ nextZesP }}" aria-label="Następna osoba" style="position: relative; min-height: min(50vw, 52vh); background: #6E6B67; border: 0; border-left: 1px solid #5B584F; display: flex; align-items: flex-end; padding: 28px 40px; overflow: hidden; cursor: pointer; text-align: left;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(13vw, 24vh); height: min(13vw, 24vh);"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.4"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            <span style="position: relative; font: 400 10px/1.4 Archivo; letter-spacing: 0.14em; text-transform: uppercase; color: #E4E1DC;">Zdjęcie — {{ zesPName }}</span>
+          </button>
+        </section>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pAktualnosci }}">
+      <div style="max-width: 1320px; margin: 0 auto; padding: 0 40px;">
+        <section style="padding: 72px 0 56px;">
+          <h1 style="margin: 0 0 24px; font: 500 clamp(40px, 5vw, 68px)/1 Archivo; letter-spacing: -0.045em;">Aktualności</h1>
+          <p style="margin: 0; max-width: 62ch; font: 300 21px/1.55 Newsreader, Georgia, serif; color: #35322E;">[paragraf 1] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. [paragraf 1]</p>
+        </section>
+        <div style="margin: 0 calc(50% - 50vw); padding: 0 40px; border-bottom: 1px solid #DEDBD6; overflow-x: auto; overflow-y: hidden;">
+          <div style="display: flex; min-width: min-content;">
+            <sc-for list="{{ newsFilters }}" as="f" hint-placeholder-count="4">
+              <button data-filter="{{ f.key }}" style="flex: 1 1 auto; text-align: center; font: 500 11px/1 Archivo; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; padding: 22px 26px; border: 0; border-left: {{ f.divider }}; background: transparent; color: {{ f.fg }}; cursor: pointer;" style-hover="color: #101010;">{{ f.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <section style="padding: 0;">
+          <sc-for list="{{ newsList }}" as="n" hint-placeholder-count="6">
+            <a href="#{{ n.href }}" data-href="{{ n.href }}" style="display: grid; grid-template-columns: 1fr calc(50vw - 40px); margin-right: calc(50% - 50vw + 40px); border-bottom: 1px solid #DEDBD6; align-items: start; text-decoration: none;" style-hover="text-decoration: none;">
+              <div style="display: grid; grid-template-columns: 160px 1fr; gap: 32px; padding: 30px 40px 30px 0; align-items: start; min-width: 0;">
+                <span style="font: 400 12px/1.4 Archivo; letter-spacing: 0.1em; text-transform: uppercase; color: #8A8681;">{{ n.date }}</span>
+                <div style="display: grid; gap: 8px; min-width: 0;">
+                  <span style="font: 500 23px/1.25 Archivo; letter-spacing: -0.025em; text-wrap: pretty;">{{ n.title }}</span>
+                  <span style="font: 400 15px/1.6 Archivo; color: #6E6B67; text-wrap: pretty;">{{ n.lead }}</span>
+                  <span style="font: 400 12px/1.4 Archivo; letter-spacing: 0.06em; text-transform: uppercase; color: #8A8681; margin-top: 6px;">{{ n.source }}</span>
+                </div>
+              </div>
+              <div style="aspect-ratio: 1 / 1; background: #6E6B67; margin-bottom: 40px; display: flex; align-items: flex-end; padding: 18px; position: relative; overflow: hidden;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(10vw, 120px); height: min(10vw, 120px);"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.4"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                <span style="position: relative; font: 400 10px/1.4 Archivo; letter-spacing: 0.14em; text-transform: uppercase; color: #E4E1DC;">Zdjęcie — wpis</span>
+              </div>
+            </a>
+          </sc-for>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pPortal }}">
+      <div style="max-width: 1320px; margin: 0 auto; padding: 0 40px;">
+        <section style="position: relative; margin: 0 -40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); grid-auto-rows: minmax(min-content, auto); min-height: calc(100vh - 120px); border-bottom: 1px solid #DEDBD6;">
+          <div aria-hidden="true" style="position: absolute; left: 50%; top: max(56px, 9vh); bottom: max(56px, 9vh); width: 1px; margin-left: -0.5px; background: #DEDBD6; pointer-events: none; display: {{ startLineDisp }};"></div>
+          <div style="display: grid; align-content: center; gap: clamp(20px, 3.4vh, 40px); padding: max(56px, 9vh) max(48px, 4vw) max(56px, 9vh) 40px;">
+            <h1 style="margin: 0; font: 500 clamp(30px, min(3.6vw, 7vh), 60px)/1.04 Archivo; letter-spacing: -0.035em; text-wrap: balance;">Nagłówek 1</h1>
+            <p style="margin: 0; max-width: 44ch; font: 300 clamp(17px, min(1.5vw, 2.6vh), 22px)/1.5 Newsreader, Georgia, serif; color: #35322E; text-wrap: pretty;">[paragraf 1] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. [paragraf 1]</p>
+          </div>
+          <div style="display: grid; align-content: center; gap: clamp(16px, 2.2vh, 24px); padding: max(56px, 9vh) 40px max(56px, 9vh) max(48px, 4vw);">
+            <h2 style="margin: 0 0 clamp(8px, 1.4vh, 16px); font: 500 clamp(20px, min(2vw, 3.6vh), 28px)/1.2 Archivo; letter-spacing: -0.025em;">Nagłówek 2</h2>
+            <button type="button" style="font: 500 12px/1 Archivo; letter-spacing: 0.08em; text-transform: uppercase; padding: 19px 26px; border: 1px solid #101010; background: transparent; color: #101010; text-align: center; cursor: pointer;" style-hover="background: #EFEDE9;">Przycisk 1</button>
+            <button type="button" style="font: 500 12px/1 Archivo; letter-spacing: 0.08em; text-transform: uppercase; padding: 19px 26px; border: 1px solid #101010; background: transparent; color: #101010; text-align: center; cursor: pointer;" style-hover="background: #EFEDE9;">Przycisk 2</button>
+            <button type="button" style="font: 500 12px/1 Archivo; letter-spacing: 0.08em; text-transform: uppercase; padding: 19px 26px; background: #101010; border: 1px solid #101010; color: #FAF9F7; text-align: center; cursor: pointer;" style-hover="background: #35322E;">Przycisk 3</button>
+          </div>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pKontakt }}">
+      <div style="max-width: 1320px; margin: 0 auto; padding: 0 40px;">
+        <section style="padding: 72px 0 56px;">
+          <h1 style="margin: 0 0 24px; font: 500 clamp(40px, 5vw, 68px)/1 Archivo; letter-spacing: -0.045em;">Kontakt</h1>
+          <p style="margin: 0; max-width: 62ch; font: 300 21px/1.55 Newsreader, Georgia, serif; color: #35322E;">[paragraf 1] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. [paragraf 1]</p>
+        </section>
+        <div style="min-height: calc(100vh - 120px); display: grid; grid-template-rows: auto 1fr;">
+          <div style="margin: 0 calc(50% - 50vw); padding: 0 40px; border-bottom: 1px solid #DEDBD6; overflow-x: auto; overflow-y: hidden;">
+            <div style="display: flex; min-width: min-content;">
+              <sc-for list="{{ konFilters }}" as="f" hint-placeholder-count="5">
+                <button onClick="{{ f.onClick }}" style="flex: 1 1 auto; text-align: center; font: 500 11px/1 Archivo; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; padding: 22px 26px; border: 0; border-left: {{ f.divider }}; background: transparent; color: {{ f.fg }}; cursor: pointer;" style-hover="color: #101010;">{{ f.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+          <section style="margin: 0 calc(50% - 50vw); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); grid-auto-rows: minmax(min-content, auto); min-height: 0; border-bottom: 1px solid #DEDBD6;">
+            <div style="position: relative; min-height: min(50vw, 52vh); border-right: 1px solid #DEDBD6; overflow: hidden; background-color: #E8E6E2; background-image: url('assets/map-mono.png'); background-size: cover; background-position: 50% 50%; background-repeat: no-repeat;">
+              <div style="position: absolute; left: 50%; top: 50%; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 6px rgba(0,0,0,0.18); display: flex; align-items: center; justify-content: center;">
+                <span style="width: 14px; height: 14px; border-radius: 50%; background: #101010; display: block;"></span>
+              </div>
+            </div>
+            <div style="display: grid; align-content: center; gap: min(2.2vh, 20px); padding: max(56px, 9vh) max(40px, calc(50vw - 620px)) max(56px, 9vh) max(48px, 4vw);">
+              <div style="font: 500 11px/1 Archivo; letter-spacing: 0.18em; text-transform: uppercase; color: #8A8681;">{{ konKicker }}</div>
+              <h3 style="margin: 0; font: 500 clamp(30px, min(3.6vw, 7vh), 60px)/1.04 Archivo; letter-spacing: -0.035em; text-wrap: balance;">{{ konName }}</h3>
+              <span style="font: 400 clamp(17px, min(1.5vw, 2.6vh), 22px)/1.5 Archivo; color: #35322E;">{{ konAddr }}</span>
+              <span style="font: 400 clamp(15px, 1.3vw, 18px)/1.7 Archivo; color: #35322E;">{{ konTel }} · {{ konMail }}</span>
+              <span style="font: 400 clamp(15px, 1.3vw, 18px)/1.7 Archivo; color: #6E6B67;">{{ konHours }}</span>
+              <a href="#{{ konHref }}" data-href="{{ konHref }}" style="display: {{ konLinkDisp }}; font: 500 12px/1 Archivo; letter-spacing: 0.1em; text-transform: uppercase; margin-top: min(3vh, 24px);">{{ konLinkLabel }} →</a>
+            </div>
+          </section>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pPolityka }}">
+      <div style="max-width: 1320px; margin: 0 auto; padding: 0 40px;">
+        <section style="padding: 72px 0 96px; max-width: 74ch;">
+          <h1 style="margin: 0 0 28px; font: 500 clamp(36px, 4vw, 56px)/1.02 Archivo; letter-spacing: -0.04em;">Polityka prywatności</h1>
+          <sc-for list="{{ policy }}" as="s" hint-placeholder-count="4">
+            <div style="display: grid; gap: 12px; padding: 26px 0; border-bottom: 1px solid #DEDBD6;">
+              <span style="font: 500 19px/1.3 Archivo; letter-spacing: -0.02em;">{{ s.title }}</span>
+              <span style="font: 400 16px/1.7 Archivo; color: #35322E; text-wrap: pretty;">{{ s.body }}</span>
+            </div>
+          </sc-for>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pList }}">
+      <div style="max-width: 1320px; margin: 0 auto; padding: 0 40px;">
+        <section style="padding: 72px 0 48px; border-bottom: 1px solid #DEDBD6;">
+          <h1 style="margin: 0 0 24px; font: 500 clamp(40px, 5vw, 68px)/1 Archivo; letter-spacing: -0.045em;">{{ listTitle }}</h1>
+          <p style="margin: 0; max-width: 64ch; font: 300 21px/1.55 Newsreader, Georgia, serif; color: #35322E;">{{ listLead }}</p>
+        </section>
+        <section style="padding: 0;">
+          <sc-for list="{{ listItems }}" as="i" hint-placeholder-count="2">
+            <div style="display: grid; grid-template-columns: calc(50vw - 40px) 1fr; margin-left: calc(50% - 50vw + 40px); border-bottom: 1px solid #DEDBD6; align-items: start;">
+              <div style="aspect-ratio: 1 / 1; background: #6E6B67; margin-bottom: 40px; display: flex; align-items: flex-end; padding: 18px; position: relative; overflow: hidden;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(10vw, 120px); height: min(10vw, 120px);"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.4"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                <span style="position: relative; font: 400 10px/1.4 Archivo; letter-spacing: 0.14em; text-transform: uppercase; color: #E4E1DC;">Zdjęcie — {{ i.name }}</span>
+              </div>
+              <div style="display: grid; gap: 14px; align-content: start; padding: 30px 0 30px 40px; min-width: 0;">
+                <span style="font: 500 10px/1 Archivo; letter-spacing: 0.16em; text-transform: uppercase; color: #8A8681;">{{ i.tag }}</span>
+                <a href="#{{ i.href }}" data-href="{{ i.href }}" style="font: 500 34px/1.08 Archivo; letter-spacing: -0.035em; text-wrap: balance;">{{ i.name }}</a>
+                <span style="font: 400 16px/1.65 Archivo; color: #35322E; max-width: 58ch; text-wrap: pretty;">{{ i.short }}</span>
+                <span style="font: 400 14px/1.6 Archivo; color: #6E6B67;">{{ i.addr }} · {{ i.hours }}</span>
+                <a href="#{{ i.href }}" data-href="{{ i.href }}" style="justify-self: start; margin-top: 12px; font: 500 12px/1 Archivo; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 26px; border: 1px solid #101010; text-align: center; text-decoration: none;" style-hover="background: #EFEDE9; text-decoration: none;">Strona placówki</a>
+              </div>
+            </div>
+          </sc-for>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pInst }}">
+      <div style="max-width: 1320px; margin: 0 auto; padding: 0 40px;">
+        <section style="margin: 0 calc(50% - 50vw); min-height: calc(100vh - 120px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); grid-auto-rows: minmax(min-content, auto); border-bottom: 1px solid #DEDBD6;">
+          <div style="display: grid; align-content: center; gap: min(2.2vh, 20px); padding: max(56px, 9vh) max(48px, 4vw) max(56px, 9vh) max(40px, calc(50vw - 620px));">
+            <div style="font: 500 11px/1 Archivo; letter-spacing: 0.18em; text-transform: uppercase; color: #8A8681;">{{ instKind }} · {{ instTag }}</div>
+            <h1 style="margin: 0; font: 500 clamp(36px, min(4.2vw, 8vh), 66px)/1 Archivo; letter-spacing: -0.045em; text-wrap: balance;">{{ instName }}</h1>
+            <p style="margin: 0; max-width: 46ch; font: 300 clamp(17px, min(1.5vw, 2.6vh), 22px)/1.5 Newsreader, Georgia, serif; color: #35322E; text-wrap: pretty;">{{ instLead }}</p>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: min(3vh, 24px);">
+              <a href="#{{ ctaHref }}" data-href="{{ ctaHref }}" style="font: 500 12px/1 Archivo; letter-spacing: 0.08em; text-transform: uppercase; padding: 17px 26px; background: #101010; color: #FAF9F7; text-decoration: none;" style-hover="background: #35322E; text-decoration: none;">{{ ctaLabel }}</a>
+              <a href="#{{ instContactHref }}" data-href="{{ instContactHref }}" style="font: 500 12px/1 Archivo; letter-spacing: 0.08em; text-transform: uppercase; padding: 17px 26px; border: 1px solid #101010; text-decoration: none;" style-hover="background: #EFEDE9; text-decoration: none;">Kontakt CTA</a>
+            </div>
+          </div>
+          <div style="position: relative; min-height: min(50vw, 52vh); background: #6E6B67; border-left: 1px solid #5B584F; display: flex; align-items: flex-end; padding: 28px 40px; overflow: hidden;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(13vw, 24vh); height: min(13vw, 24vh);"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.4"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            <span style="position: relative; font: 400 10px/1.4 Archivo; letter-spacing: 0.14em; text-transform: uppercase; color: #E4E1DC;">Zdjęcie — budynek placówki</span>
+          </div>
+        </section>
+
+        <section style="position: relative; margin: 0 -40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); grid-auto-rows: minmax(min-content, auto); min-height: calc(100vh - 120px); border-bottom: 1px solid #DEDBD6;">
+          <div aria-hidden="true" style="position: absolute; left: 50%; top: max(56px, 9vh); bottom: max(56px, 9vh); width: 1px; margin-left: -0.5px; background: #DEDBD6; pointer-events: none; display: {{ startLineDisp }};"></div>
+          <div style="display: grid; align-content: center; gap: clamp(20px, 3.4vh, 40px); padding: max(56px, 9vh) max(48px, 4vw) max(56px, 9vh) 40px;">
+            <div style="font: 500 11px/1 Archivo; letter-spacing: 0.18em; text-transform: uppercase; color: #8A8681;">{{ instStartKicker }}</div>
+            <h2 style="margin: 0; font: 500 clamp(30px, min(3.6vw, 7vh), 60px)/1.04 Archivo; letter-spacing: -0.035em; text-wrap: balance;">{{ instStartTitle }}</h2>
+            <p style="margin: 0; max-width: 44ch; font: 300 clamp(17px, min(1.5vw, 2.6vh), 22px)/1.5 Newsreader, Georgia, serif; color: #35322E; text-wrap: pretty;">{{ instStartBody }}</p>
+            <a href="#{{ instHref }}" data-href="{{ instHref }}" style="font: 500 12px/1 Archivo; letter-spacing: 0.1em; text-transform: uppercase; margin-top: min(2.4vh, 22px); justify-self: start;">{{ instStartCta }} →</a>
+          </div>
+          <div style="display: grid; align-content: center; gap: clamp(28px, 4.2vh, 52px); padding: max(56px, 9vh) 40px max(56px, 9vh) max(48px, 4vw);">
+            <sc-for list="{{ instStartTabs }}" as="t" hint-placeholder-count="4">
+              <button onClick="{{ t.onClick }}" style="width: 100%; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 16px; text-align: left; padding: clamp(16px, 2vh, 24px) clamp(18px, 1.6vw, 26px); cursor: pointer; border: 1px solid {{ t.bc }}; background: {{ t.bg }};" style-hover="border-color: #8A8681;">
+                <span style="font: 400 11px/1 Archivo; letter-spacing: 0.14em; color: #8A8681;">{{ t.num }}</span>
+                <span style="font: 500 clamp(13px, 1.15vw, 15px)/1.35 Archivo; letter-spacing: 0.06em; text-transform: uppercase; color: {{ t.fg }};">{{ t.label }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </section>
+
+
+        <section style="position: relative; margin: 0 calc(50% - 50vw); min-height: calc(100vh - 120px); display: flex; flex-direction: column; overflow: hidden;">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; padding: 64px 0 0 max(40px, calc(50vw - 620px)); position: relative; z-index: 1;">
+            <h2 style="margin: 0; font: 500 clamp(30px, 3.2vw, 44px)/1.02 Archivo; letter-spacing: -0.035em;">Aktualności</h2>
+            <div style="display: grid; justify-items: end; gap: 0;">
+              <a href="#{{ instNewsHref }}" data-href="{{ instNewsHref }}" style="font: 500 12px/1 Archivo; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 20px; justify-self: center;">Wszystkie wpisy →</a>
+              <div style="display: flex; gap: {{ navBtnGap }};">
+                <button onClick="{{ scrollNewsPrev }}" aria-label="Poprzedni" style="width: {{ navBtnW }}; height: 56px; border: 1px solid #DEDBD6; background: transparent; cursor: pointer; font: 400 18px/1 Archivo;">←</button>
+                <button onClick="{{ scrollNewsNext }}" aria-label="Następny" style="width: {{ navBtnW }}; height: 56px; border: 1px solid #DEDBD6; background: transparent; cursor: pointer; font: 400 18px/1 Archivo;">→</button>
+              </div>
+            </div>
+          </div>
+          <div class="news-slider" ref="{{ newsSliderRef }}" style="flex: 1; display: flex; gap: 28px; overflow-x: auto; padding: 0 0 56px; scrollbar-width: none; position: relative; z-index: 1;">
+            <sc-for list="{{ newsLoop }}" as="n" hint-placeholder-count="4">
+              <a href="#{{ instNewsHref }}" data-href="{{ instNewsHref }}" style="flex: 0 0 clamp(300px, 38vw, 620px); display: grid; grid-template-rows: auto auto; gap: 20px; text-decoration: none;" style-hover="text-decoration: none;">
+                <div style="width: 100%; min-width: 0; max-width: 100%; aspect-ratio: 1/1; background: #6E6B67; border: 1px solid #5B584F; display: flex; align-items: center; justify-content: center;"><svg width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.4"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
+                <div style="display: grid; gap: 10px;">
+                  <span style="font: 400 12px/1 Archivo; letter-spacing: 0.12em; text-transform: uppercase; color: #8A8681;">{{ n.date }} · {{ n.source }}</span>
+                  <span style="font: 500 26px/1.2 Archivo; letter-spacing: -0.025em; text-wrap: pretty;">{{ n.title }}</span>
+                  <span style="font: 400 15px/1.5 Archivo; color: #6E6B67;">{{ n.lead }}</span>
+                </div>
+              </a>
+            </sc-for>
+          </div>
+        </section>
+
+        <section style="margin: 0 calc(50% - 50vw); position: relative; height: clamp(240px, 32vw, 480px); border-top: 1px solid #DEDBD6; overflow: hidden; background-color: #E8E6E2; background-image: url('assets/map-mono.png'); background-size: cover; background-position: 50% 50%; background-repeat: no-repeat;">
+          <div style="position: absolute; left: 50%; top: 50%; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 6px rgba(0,0,0,0.18); display: flex; align-items: center; justify-content: center;">
+            <span style="width: 14px; height: 14px; border-radius: 50%; background: #101010; display: block;"></span>
+          </div>
+          <div style="position: absolute; left: 50%; top: 50%; transform: translate(6px, -74px); background: #FFFFFF; border: 1px solid #DEDBD6; box-shadow: 0 2px 10px rgba(0,0,0,0.07); padding: 12px 16px; display: grid; gap: 3px; text-align: left; max-width: min(280px, 44vw);">
+            <span style="font: 400 clamp(12px, 1.05vw, 14px)/1.45 Archivo; color: #101010; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ instAddr }}</span>
+          </div>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pInstAktualnosci }}">
+      <div style="max-width: 1320px; margin: 0 auto; padding: 0 40px;">
+        <section style="padding: 64px 0 40px; border-bottom: 1px solid #DEDBD6;">
+          <h1 style="margin: 0 0 20px; font: 500 clamp(36px, 4.4vw, 60px)/1 Archivo; letter-spacing: -0.045em;">Aktualności</h1>
+          <p style="margin: 0; max-width: 62ch; font: 300 20px/1.55 Newsreader, Georgia, serif; color: #35322E;">[paragraf 1] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. [paragraf 1]</p>
+        </section>
+        <section style="padding: 0;">
+          <sc-for list="{{ instNews }}" as="n" hint-placeholder-count="4">
+            <div style="display: grid; grid-template-columns: 1fr calc(50vw - 40px); margin-right: calc(50% - 50vw + 40px); border-bottom: 1px solid #DEDBD6; align-items: start;">
+              <div style="display: grid; grid-template-columns: 160px 1fr; gap: 32px; padding: 30px 40px 30px 0; align-items: start; min-width: 0;">
+                <span style="font: 400 12px/1.4 Archivo; letter-spacing: 0.1em; text-transform: uppercase; color: #8A8681;">{{ n.date }}</span>
+                <div style="display: grid; gap: 8px; min-width: 0;">
+                  <span style="font: 500 23px/1.25 Archivo; letter-spacing: -0.025em; text-wrap: pretty;">{{ n.title }}</span>
+                  <span style="font: 400 15px/1.6 Archivo; color: #6E6B67; text-wrap: pretty;">{{ n.lead }}</span>
+                </div>
+              </div>
+              <div style="aspect-ratio: 1 / 1; background: #6E6B67; margin-bottom: 40px; display: flex; align-items: flex-end; padding: 18px; position: relative; overflow: hidden;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(10vw, 120px); height: min(10vw, 120px);"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.4"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                <span style="position: relative; font: 400 10px/1.4 Archivo; letter-spacing: 0.14em; text-transform: uppercase; color: #E4E1DC;">Zdjęcie — wpis</span>
+              </div>
+            </div>
+          </sc-for>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pInstZespol }}">
+      <div style="max-width: 1320px; margin: 0 auto; padding: 0 40px;">
+        <section style="margin: 0 calc(50% - 50vw); min-height: calc(100vh - 120px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); grid-auto-rows: minmax(min-content, auto); border-bottom: 1px solid #DEDBD6;">
+          <div style="display: grid; align-content: center; gap: min(2.2vh, 20px); padding: max(56px, 9vh) max(48px, 4vw) max(56px, 9vh) max(40px, calc(50vw - 620px));">
+            <div style="font: 500 11px/1 Archivo; letter-spacing: 0.18em; text-transform: uppercase; color: #8A8681;">{{ instZesInst }}</div>
+            <h3 style="margin: 0; font: 500 clamp(30px, min(3.6vw, 7vh), 60px)/1.04 Archivo; letter-spacing: -0.035em; text-wrap: balance;">{{ instZesName }}</h3>
+            <span style="font: 400 clamp(13px, 1.1vw, 15px)/1.3 Archivo; letter-spacing: 0.02em; color: #6E6B67;">{{ instZesRole }}</span>
+            <p style="margin: 0; max-width: 46ch; font: 300 clamp(17px, min(1.5vw, 2.6vh), 22px)/1.5 Newsreader, Georgia, serif; color: #35322E; text-wrap: pretty;">[paragraf 1] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. [paragraf 1]</p>
+            <div style="display: flex; gap: clamp(6px, 0.8vw, 12px); margin-top: min(3vh, 28px);">
+              <sc-for list="{{ instZesSegs }}" as="s" hint-placeholder-count="4">
+                <button onClick="{{ s.onClick }}" aria-label="{{ s.label }}" style="flex: 1 1 0; min-width: 0; padding: 14px 0; border: 0; background: transparent; cursor: pointer; display: block;">
+                  <span style="display: block; height: 3px; background: {{ s.bg }};"></span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          <button onClick="{{ nextInstZes }}" aria-label="Następna osoba" style="position: relative; min-height: min(50vw, 52vh); background: #6E6B67; border: 0; border-left: 1px solid #5B584F; display: flex; align-items: flex-end; padding: 28px 40px; overflow: hidden; cursor: pointer; text-align: left;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(13vw, 24vh); height: min(13vw, 24vh);"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.4"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            <span style="position: relative; font: 400 10px/1.4 Archivo; letter-spacing: 0.14em; text-transform: uppercase; color: #E4E1DC;">Zdjęcie — {{ instZesName }}</span>
+          </button>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pInstKontakt }}">
+      <div style="max-width: 1320px; margin: 0 auto; padding: 0 40px;">
+        <section style="padding: 64px 0 48px;">
+          <h1 style="margin: 0 0 20px; font: 500 clamp(36px, 4.4vw, 60px)/1 Archivo; letter-spacing: -0.045em;">Kontakt</h1>
+          <p style="margin: 0; max-width: 62ch; font: 300 20px/1.55 Newsreader, Georgia, serif; color: #35322E;">[paragraf 1] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. [paragraf 1]</p>
+        </section>
+        <section style="margin: 0 calc(50% - 50vw); min-height: calc(100vh - 120px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); grid-auto-rows: minmax(min-content, auto); border-top: 1px solid #DEDBD6; border-bottom: 1px solid #DEDBD6;">
+          <div style="position: relative; min-height: min(50vw, 52vh); border-right: 1px solid #DEDBD6; overflow: hidden; background-color: #E8E6E2; background-image: url('assets/map-mono.png'); background-size: cover; background-position: 50% 50%; background-repeat: no-repeat;">
+            <div style="position: absolute; left: 50%; top: 50%; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 6px rgba(0,0,0,0.18); display: flex; align-items: center; justify-content: center;">
+              <span style="width: 14px; height: 14px; border-radius: 50%; background: #101010; display: block;"></span>
+            </div>
+          </div>
+          <div style="display: grid; align-content: center; gap: min(2.2vh, 20px); padding: max(56px, 9vh) max(40px, calc(50vw - 620px)) max(56px, 9vh) max(48px, 4vw);">
+            <div style="font: 500 11px/1 Archivo; letter-spacing: 0.18em; text-transform: uppercase; color: #8A8681;">Kontakt placówki</div>
+            <h3 style="margin: 0; font: 500 clamp(30px, min(3.6vw, 7vh), 60px)/1.04 Archivo; letter-spacing: -0.035em; text-wrap: balance;">{{ instName }}</h3>
+            <span style="font: 400 clamp(17px, min(1.5vw, 2.6vh), 22px)/1.5 Archivo; color: #35322E;">{{ instAddr }}</span>
+            <span style="font: 400 clamp(15px, 1.3vw, 18px)/1.7 Archivo; color: #35322E;">{{ instTel }} · {{ instMail }}</span>
+            <span style="font: 400 clamp(15px, 1.3vw, 18px)/1.7 Archivo; color: #6E6B67;">{{ instHours }}</span>
+            <a href="#/kontakt" data-href="/kontakt" style="font: 500 12px/1 Archivo; letter-spacing: 0.1em; text-transform: uppercase; margin-top: min(3vh, 24px);">Kontakt ogólny Effatha →</a>
+          </div>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pZgloszenia }}">
+      <div style="max-width: 1320px; margin: 0 auto; padding: 0 40px;">
+        <div style="margin: 0 calc(50% - 50vw); padding: 0 40px; background: #FAF9F7; border-bottom: 1px solid #DEDBD6; overflow-x: auto; overflow-y: hidden;">
+          <div style="display: flex; min-width: min-content;">
+            <sc-for list="{{ zglInstTabs }}" as="f" hint-placeholder-count="5">
+              <button onClick="{{ f.onClick }}" style="flex: 1 1 auto; text-align: center; font: 500 11px/1 Archivo; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; padding: 22px 26px; border: 0; border-left: {{ f.divider }}; background: transparent; color: {{ f.fg }}; cursor: pointer;" style-hover="color: #101010;">{{ f.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="margin: 0 calc(50% - 50vw); padding: 0 40px; background: #F2F0EC; border-bottom: 1px solid #DEDBD6; overflow-x: auto; overflow-y: hidden;">
+          <div style="display: flex; min-width: min-content;">
+            <sc-for list="{{ zglTabs }}" as="t" hint-placeholder-count="4">
+              <button onClick="{{ t.onClick }}" style="flex: 1 1 auto; text-align: center; font: 500 11px/1 Archivo; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; padding: 18px 26px; border: 0; border-left: {{ t.divider }}; background: transparent; color: {{ t.fg }}; cursor: pointer;" style-hover="color: #101010;">{{ t.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <section style="position: relative; margin: 0 -40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); grid-auto-rows: minmax(min-content, auto); min-height: calc(100vh - 120px); border-bottom: 1px solid #DEDBD6;">
+          <div aria-hidden="true" style="position: absolute; left: 50%; top: max(56px, 9vh); bottom: max(56px, 9vh); width: 1px; margin-left: -0.5px; background: #DEDBD6; pointer-events: none; display: {{ startLineDisp }};"></div>
+          <div style="display: grid; align-content: center; gap: clamp(20px, 3.4vh, 40px); padding: max(56px, 9vh) max(48px, 4vw) max(56px, 9vh) 40px;">
+            <div style="font: 500 11px/1 Archivo; letter-spacing: 0.18em; text-transform: uppercase; color: #8A8681;">{{ zglScope }} · {{ zglLabel }}</div>
+            <h2 style="margin: 0; font: 500 clamp(30px, min(3.6vw, 7vh), 60px)/1.04 Archivo; letter-spacing: -0.035em; text-wrap: balance;">Nagłówek 2</h2>
+            <p style="margin: 0; max-width: 44ch; font: 300 clamp(17px, min(1.5vw, 2.6vh), 22px)/1.5 Newsreader, Georgia, serif; color: #35322E; text-wrap: pretty;">[paragraf 2] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [paragraf 2]</p>
+          </div>
+          <div style="display: grid; align-content: center; gap: clamp(14px, 1.8vh, 20px); padding: max(56px, 9vh) 40px max(56px, 9vh) max(48px, 4vw);">
+            <label style="display: grid; gap: 7px; font: 400 13px/1 Archivo; color: #35322E;">[etykieta pola]
+              <input style="padding: 14px; border: 1px solid #DEDBD6; background: #FFFFFF; font: 400 15px/1.2 Archivo;">
+            </label>
+            <label style="display: grid; gap: 7px; font: 400 13px/1 Archivo; color: #35322E;">[etykieta pola]
+              <input style="padding: 14px; border: 1px solid #DEDBD6; background: #FFFFFF; font: 400 15px/1.2 Archivo;">
+            </label>
+            <label style="display: grid; gap: 7px; font: 400 13px/1 Archivo; color: #35322E;">[etykieta pola]
+              <textarea rows="4" style="padding: 14px; border: 1px solid #DEDBD6; background: #FFFFFF; font: 400 15px/1.4 Archivo; resize: vertical;"></textarea>
+            </label>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: min(2vh, 12px);">
+              <button type="button" style="font: 500 12px/1 Archivo; letter-spacing: 0.08em; text-transform: uppercase; padding: 17px 26px; border: 1px solid #101010; background: transparent; color: #101010; cursor: pointer;" style-hover="background: #EFEDE9;">[przycisk]</button>
+              <button type="button" style="font: 500 12px/1 Archivo; letter-spacing: 0.08em; text-transform: uppercase; padding: 17px 26px; border: 1px solid #101010; background: #101010; color: #FAF9F7; cursor: pointer;" style-hover="background: #35322E;">[przycisk]</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pInstZgloszenia }}">
+      <div style="max-width: 1320px; margin: 0 auto; padding: 0 40px;">
+        <div style="position: sticky; top: {{ mainPadTop }}; z-index: 3; margin: 0 calc(50% - 50vw); padding: 0 40px; background: #FAF9F7; border-bottom: 1px solid #DEDBD6; overflow-x: auto; overflow-y: hidden;">
+          <div style="display: flex; min-width: min-content;">
+            <sc-for list="{{ zglTabs }}" as="t" hint-placeholder-count="4">
+              <button onClick="{{ t.onClick }}" style="flex: 1 1 auto; text-align: center; font: 500 11px/1 Archivo; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; padding: 22px 26px; border: 0; border-left: {{ t.divider }}; background: transparent; color: {{ t.fg }}; cursor: pointer;" style-hover="color: #101010;">{{ t.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <section style="position: relative; margin: 0 -40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); grid-auto-rows: minmax(min-content, auto); min-height: calc(100vh - 120px); border-bottom: 1px solid #DEDBD6;">
+          <div aria-hidden="true" style="position: absolute; left: 50%; top: max(56px, 9vh); bottom: max(56px, 9vh); width: 1px; margin-left: -0.5px; background: #DEDBD6; pointer-events: none; display: {{ startLineDisp }};"></div>
+          <div style="display: grid; align-content: center; gap: clamp(20px, 3.4vh, 40px); padding: max(56px, 9vh) max(48px, 4vw) max(56px, 9vh) 40px;">
+            <div style="font: 500 11px/1 Archivo; letter-spacing: 0.18em; text-transform: uppercase; color: #8A8681;">{{ zglLabel }}</div>
+            <h2 style="margin: 0; font: 500 clamp(30px, min(3.6vw, 7vh), 60px)/1.04 Archivo; letter-spacing: -0.035em; text-wrap: balance;">Nagłówek 2</h2>
+            <p style="margin: 0; max-width: 44ch; font: 300 clamp(17px, min(1.5vw, 2.6vh), 22px)/1.5 Newsreader, Georgia, serif; color: #35322E; text-wrap: pretty;">[paragraf 2] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [paragraf 2]</p>
+          </div>
+          <div style="display: grid; align-content: center; gap: clamp(14px, 1.8vh, 20px); padding: max(56px, 9vh) 40px max(56px, 9vh) max(48px, 4vw);">
+            <label style="display: grid; gap: 7px; font: 400 13px/1 Archivo; color: #35322E;">[etykieta pola]
+              <input style="padding: 14px; border: 1px solid #DEDBD6; background: #FFFFFF; font: 400 15px/1.2 Archivo;">
+            </label>
+            <label style="display: grid; gap: 7px; font: 400 13px/1 Archivo; color: #35322E;">[etykieta pola]
+              <input style="padding: 14px; border: 1px solid #DEDBD6; background: #FFFFFF; font: 400 15px/1.2 Archivo;">
+            </label>
+            <label style="display: grid; gap: 7px; font: 400 13px/1 Archivo; color: #35322E;">[etykieta pola]
+              <textarea rows="4" style="padding: 14px; border: 1px solid #DEDBD6; background: #FFFFFF; font: 400 15px/1.4 Archivo; resize: vertical;"></textarea>
+            </label>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: min(2vh, 12px);">
+              <button type="button" style="font: 500 12px/1 Archivo; letter-spacing: 0.08em; text-transform: uppercase; padding: 17px 26px; border: 1px solid #101010; background: transparent; color: #101010; cursor: pointer;" style-hover="background: #EFEDE9;">[przycisk]</button>
+              <button type="button" style="font: 500 12px/1 Archivo; letter-spacing: 0.08em; text-transform: uppercase; padding: 17px 26px; border: 1px solid #101010; background: #101010; color: #FAF9F7; cursor: pointer;" style-hover="background: #35322E;">[przycisk]</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pInstCennik }}">
+      <div style="max-width: 1320px; margin: 0 auto; padding: 0 40px;">
+        <section style="padding: 64px 0 40px; border-bottom: 1px solid #DEDBD6;">
+          <h1 style="margin: 0 0 20px; font: 500 clamp(36px, 4.4vw, 60px)/1 Archivo; letter-spacing: -0.045em;">Cennik</h1>
+          <p style="margin: 0; max-width: 62ch; font: 300 20px/1.55 Newsreader, Georgia, serif; color: #35322E;">[paragraf 1] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. [paragraf 1]</p>
+        </section>
+        <section style="padding: 40px 0 88px;">
+          <div style="display: grid; grid-template-columns: 1fr 260px 160px; gap: 32px; padding: 14px 0; border-bottom: 1px solid #101010;">
+            <span style="font: 500 10px/1 Archivo; letter-spacing: 0.16em; text-transform: uppercase; color: #8A8681;">Usługa</span>
+            <span style="font: 500 10px/1 Archivo; letter-spacing: 0.16em; text-transform: uppercase; color: #8A8681;">Zakres</span>
+            <span style="font: 500 10px/1 Archivo; letter-spacing: 0.16em; text-transform: uppercase; color: #8A8681; text-align: right;">Cena</span>
+          </div>
+          <sc-for list="{{ prices }}" as="p" hint-placeholder-count="6">
+            <div style="display: grid; grid-template-columns: 1fr 260px 160px; gap: 32px; padding: 22px 0; border-bottom: 1px solid #DEDBD6; align-items: baseline;">
+              <span style="font: 500 19px/1.3 Archivo; letter-spacing: -0.02em;">{{ p.name }}</span>
+              <span style="font: 400 15px/1.5 Archivo; color: #6E6B67;">{{ p.scope }}</span>
+              <span style="font: 400 19px/1.3 Archivo; text-align: right;">{{ p.price }}</span>
+            </div>
+          </sc-for>
+          <p style="margin: 32px 0 0; max-width: 62ch; font: 400 14px/1.6 Archivo; color: #6E6B67;">[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit. [paragraf 3]</p>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pMapa }}">
+      <div style="max-width: 1320px; margin: 0 auto; padding: 0 40px;">
+        <section style="padding: 72px 0 40px; border-bottom: 1px solid #DEDBD6;">
+          <div style="font: 500 11px/1 Archivo; letter-spacing: 0.18em; text-transform: uppercase; color: #8A8681; margin-bottom: 22px;">Dokumentacja makiety</div>
+          <h1 style="margin: 0 0 20px; font: 500 clamp(36px, 4.4vw, 60px)/1 Archivo; letter-spacing: -0.045em;">Mapa architektury informacji</h1>
+          <p style="margin: 0; max-width: 66ch; font: 300 20px/1.55 Newsreader, Georgia, serif; color: #35322E;">Dwa poziomy: strona rodzic (Effatha, nie powielana) i gałęzie placówek (powielane przez redaktora). Każda nowa placówka tworzy własny adres i własny komplet podstron.</p>
+        </section>
+        <section style="padding: 48px 0 40px;">
+          <sc-for list="{{ iaTree }}" as="node" hint-placeholder-count="10">
+            <div style="display: grid; grid-template-columns: 1fr 320px 200px; gap: 28px; padding: 14px 0; border-bottom: 1px solid #DEDBD6; align-items: center; padding-left: {{ node.indent }};">
+              <span style="font: {{ node.font }}; letter-spacing: -0.01em; color: {{ node.fg }};">{{ node.label }}</span>
+              <span style="font: 400 13px/1.4 Archivo; color: #6E6B67;">{{ node.url }}</span>
+              <span style="font: 500 10px/1 Archivo; letter-spacing: 0.14em; text-transform: uppercase; color: #8A8681; text-align: right;">{{ node.kind }}</span>
+            </div>
+          </sc-for>
+        </section>
+        <section style="padding: 40px 0 88px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #DEDBD6; border: 1px solid #DEDBD6;">
+          <sc-for list="{{ iaRules }}" as="r" hint-placeholder-count="3">
+            <div style="background: #FAF9F7; padding: 30px 28px; display: grid; gap: 12px; align-content: start; min-height: 200px;">
+              <span style="font: 500 18px/1.3 Archivo; letter-spacing: -0.02em;">{{ r.title }}</span>
+              <span style="font: 400 15px/1.6 Archivo; color: #6E6B67; text-wrap: pretty;">{{ r.body }}</span>
+            </div>
+          </sc-for>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pSzablon }}">
+      <div style="max-width: 1320px; margin: 0 auto; padding: 0 40px;">
+        <section style="padding: 72px 0 40px; border-bottom: 1px solid #DEDBD6;">
+          <div style="font: 500 11px/1 Archivo; letter-spacing: 0.18em; text-transform: uppercase; color: #8A8681; margin-bottom: 22px;">Dokumentacja makiety</div>
+          <h1 style="margin: 0 0 20px; font: 500 clamp(36px, 4.4vw, 60px)/1 Archivo; letter-spacing: -0.045em;">Szablon nowej sekcji</h1>
+          <p style="margin: 0; max-width: 66ch; font: 300 20px/1.55 Newsreader, Georgia, serif; color: #35322E;">Redaktor może dodać nową podstronę do dowolnej placówki bez zmian w kodzie. Nowa pozycja pojawia się w nawigacji placówki, w okruszkach i w mapie serwisu.</p>
+        </section>
+        <section style="padding: 48px 0 88px; display: grid; gap: 24px;">
+          <sc-for list="{{ blockSpecs }}" as="b" hint-placeholder-count="4">
+            <div style="border: 1px dashed #A9A49D; padding: 30px 32px; display: grid; grid-template-columns: 240px 1fr; gap: 40px; align-items: start; background: #F5F3F0;">
+              <div style="display: grid; gap: 6px;">
+                <span style="font: 500 10px/1 Archivo; letter-spacing: 0.16em; text-transform: uppercase; color: #8A8681;">Blok</span>
+                <span style="font: 500 20px/1.25 Archivo; letter-spacing: -0.02em;">{{ b.name }}</span>
+              </div>
+              <div style="display: grid; gap: 10px;">
+                <span style="font: 400 15px/1.6 Archivo; color: #35322E; max-width: 70ch;">{{ b.body }}</span>
+                <span style="font: 400 13px/1.5 Archivo; color: #8A8681;">Pola: {{ b.fields }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </section>
+      </div>
+    </sc-if>
+
+  </main>
+
+  <footer style="border-top: 1px solid #DEDBD6; background: #F2F0EC;">
+    <div style="max-width: 1320px; margin: 0 auto; padding: 72px 40px 40px; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 56px;">
+      <div style="display: grid; gap: 14px; align-content: start;">
+        <span style="font: 500 10px/1 Archivo; letter-spacing: 0.18em; text-transform: uppercase; color: #8A8681;">{{ footerContactLabel }}</span>
+        <span style="font: 500 22px/1.3 Archivo; letter-spacing: -0.025em;">{{ footerAddr }}</span>
+        <span style="font: 400 15px/1.7 Archivo; color: #35322E;">{{ footerTel }}<br>{{ footerMail }}</span>
+        <span style="font: 400 15px/1.7 Archivo; color: #6E6B67;">{{ footerHours }}</span>
+        <sc-if value="{{ inInstitution }}">
+          <a href="#/kontakt" data-href="/kontakt" style="font: 500 11px/1 Archivo; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 6px;">Kontakt ogólny Effatha →</a>
+        </sc-if>
+        <div style="display: flex; gap: 14px; align-items: center; margin-top: 18px;">
+          <button type="button" aria-label="Facebook" style="display: flex; width: 26px; height: 26px; padding: 0; border: 0; background: transparent; cursor: pointer; color: #101010;" style-hover="color: #6E6B67;">
+            <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;"><path fill-rule="evenodd" clip-rule="evenodd" d="M0 12.067C0 18.034 4.333 22.994 10 24V15.333H7V12H10V9.333C10 6.333 11.933 4.667 14.667 4.667C15.533 4.667 16.467 4.8 17.333 4.933V8H15.8C14.333 8 14 8.733 14 9.667V12H17.2L16.667 15.333H14V24C19.667 22.994 24 18.034 24 12.067C24 5.43 18.6 0 12 0C5.4 0 0 5.43 0 12.067Z"></path></svg>
+          </button>
+          <button type="button" aria-label="Instagram" style="display: flex; width: 26px; height: 26px; padding: 0; border: 0; background: transparent; cursor: pointer; color: #101010;" style-hover="color: #6E6B67;">
+            <svg viewBox="3.375 3.375 23.25 23.25" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;"><path d="M15 10.9375C13.9226 10.9375 12.8892 11.3655 12.1274 12.1274C11.3655 12.8892 10.9375 13.9226 10.9375 15C10.9375 16.0774 11.3655 17.1108 12.1274 17.8726C12.8892 18.6345 13.9226 19.0625 15 19.0625C16.0774 19.0625 17.1108 18.6345 17.8726 17.8726C18.6345 17.1108 19.0625 16.0774 19.0625 15C19.0625 13.9226 18.6345 12.8892 17.8726 12.1274C17.1108 11.3655 16.0774 10.9375 15 10.9375Z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M8.46033 3.85319C12.8054 3.37185 17.1903 3.37185 21.5353 3.85319C23.9091 4.11819 25.8228 5.98694 26.1016 8.36944C26.6165 12.7753 26.6165 17.2261 26.1016 21.6319C25.8228 24.0144 23.9091 25.8832 21.5366 26.1494C17.1911 26.6309 12.8058 26.6309 8.46033 26.1494C6.08658 25.8832 4.17283 24.0144 3.89408 21.6332C3.37906 17.2269 3.37906 12.7757 3.89408 8.36944C4.17283 5.98694 6.08658 4.11819 8.46033 3.85319ZM21.2478 7.50069C20.9163 7.50069 20.5984 7.63239 20.3639 7.86681C20.1295 8.10123 19.9978 8.41917 19.9978 8.75069C19.9978 9.08221 20.1295 9.40015 20.3639 9.63457C20.5984 9.869 20.9163 10.0007 21.2478 10.0007C21.5793 10.0007 21.8973 9.869 22.1317 9.63457C22.3661 9.40015 22.4978 9.08221 22.4978 8.75069C22.4978 8.41917 22.3661 8.10123 22.1317 7.86681C21.8973 7.63239 21.5793 7.50069 21.2478 7.50069ZM9.06033 15.0007C9.06033 13.426 9.68589 11.9157 10.7994 10.8022C11.9129 9.68875 13.4231 9.06319 14.9978 9.06319C16.5726 9.06319 18.0828 9.68875 19.1963 10.8022C20.3098 11.9157 20.9353 13.426 20.9353 15.0007C20.9353 16.5754 20.3098 18.0856 19.1963 19.1991C18.0828 20.3126 16.5726 20.9382 14.9978 20.9382C13.4231 20.9382 11.9129 20.3126 10.7994 19.1991C9.68589 18.0856 9.06033 16.5754 9.06033 15.0007Z"></path></svg>
+          </button>
+        </div>
+      </div>
+      <div style="display: grid; gap: 12px; align-content: start;">
+        <span style="font: 500 10px/1 Archivo; letter-spacing: 0.18em; text-transform: uppercase; color: #8A8681; margin-bottom: 4px;">Placówki</span>
+        <sc-for list="{{ allInst }}" as="i" hint-placeholder-count="4">
+          <a href="#{{ i.href }}" data-href="{{ i.href }}" style="font: 400 15px/1.45 Archivo; color: #35322E;">{{ i.name }}</a>
+        </sc-for>
+      </div>
+      <div style="display: grid; gap: 12px; align-content: start;">
+        <span style="font: 500 10px/1 Archivo; letter-spacing: 0.18em; text-transform: uppercase; color: #8A8681; margin-bottom: 4px;">Effatha</span>
+        <a href="#/historia" data-href="/historia" style="font: 400 15px/1.45 Archivo; color: #35322E;">Historia</a>
+        <a href="#/zespol" data-href="/zespol" style="font: 400 15px/1.45 Archivo; color: #35322E;">Zespół</a>
+        <a href="#/aktualnosci" data-href="/aktualnosci" style="font: 400 15px/1.45 Archivo; color: #35322E;">Aktualności</a>
+        <a href="#/portal-pracownika" data-href="/portal-pracownika" style="font: 400 15px/1.45 Archivo; color: #35322E;">Portal pracownika</a>
+        <a href="#/kontakt" data-href="/kontakt" style="font: 400 15px/1.45 Archivo; color: #35322E;">Kontakt</a>
+      </div>
+      <div style="display: grid; gap: 12px; align-content: start;">
+        <span style="font: 500 10px/1 Archivo; letter-spacing: 0.18em; text-transform: uppercase; color: #8A8681; margin-bottom: 4px;">Informacje</span>
+        <a href="#/polityka-prywatnosci" data-href="/polityka-prywatnosci" style="font: 400 15px/1.45 Archivo; color: #35322E;">Polityka prywatności</a>
+        <a href="#/polityka-prywatnosci" data-href="/polityka-prywatnosci" style="font: 400 15px/1.45 Archivo; color: #35322E;">Deklaracja dostępności</a>
+        <a href="#/polityka-prywatnosci" data-href="/polityka-prywatnosci" style="font: 400 15px/1.45 Archivo; color: #35322E;">Klauzula RODO</a>
+        <span style="height: 10px;"></span>
+        <a href="#/mapa-ia" data-href="/mapa-ia" style="font: 400 15px/1.45 Archivo; color: #6E6B67;">Mapa IA (makieta)</a>
+        <a href="#/szablon-sekcji" data-href="/szablon-sekcji" style="font: 400 15px/1.45 Archivo; color: #6E6B67;">Szablon sekcji (makieta)</a>
+      </div>
+    </div>
+    <div style="max-width: 1320px; margin: 0 auto; padding: 24px 40px 40px; border-top: 1px solid #DEDBD6; display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
+      <span style="font: 400 12px/1.4 Archivo; color: #8A8681;">© Stowarzyszenie Effatha, Kraków · KRS 0000000000 · NIP 0000000000</span>
+      
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showAnnotations&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Makieta&quot;}}">
+class Component extends DCLogic {
+  state = { route: '/', mega: false, burger: false, sent: false, formError: '', filter: 'all', form: {}, headerH: 77, scrolled: false, navBtnW: '', navBtnGap: '', placIdx: 0, zesIdx: 0, histIdx: 0, startIdx: 0, vw: typeof window !== 'undefined' ? window.innerWidth : 1440 };
+  timeline = [
+    { year: 'Rok 1', title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [paragraf 3]' },
+    { year: 'Rok 2', title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [paragraf 3]' },
+    { year: 'Rok 3', title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [paragraf 3]' },
+    { year: 'Rok 4', title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [paragraf 3]' },
+    { year: 'Rok 5', title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [paragraf 3]' }
+  ];
+  headerRef = React.createRef();
+  newsSliderRef = React.createRef();
+  _newsStep = () => { const el = this.newsSliderRef.current; return el && el.children[0] ? el.children[0].offsetWidth + 28 : 0; };
+  _newsSet = () => this._newsStep() * (this._newsLen || 0);
+  _newsGo = (dir) => {
+    const el = this.newsSliderRef.current; const step = this._newsStep(); if (!el || !step) return;
+    if (this._newsTarget == null) this._newsTarget = el.scrollLeft;
+    this._newsTarget += dir * step;
+    el.scrollTo({ left: this._newsTarget, behavior: 'smooth' });
+  };
+  scrollNewsPrev = () => this._newsGo(-1);
+  scrollNewsNext = () => this._newsGo(1);
+  _onNewsScroll = () => {
+    const el = this.newsSliderRef.current; const set = this._newsSet(); if (!el || !set) return;
+    if (this._centeredEl !== el) return;
+    let shift = 0;
+    if (el.scrollLeft < set * 0.5) shift = set;
+    else if (el.scrollLeft > set * 1.5) shift = -set;
+    if (shift) {
+      el.scrollLeft += shift;
+      if (this._newsTarget != null) this._newsTarget += shift;
+    }
+    clearTimeout(this._newsSnapT);
+    this._newsSnapT = setTimeout(this._snapNews, 220);
+  };
+  _snapNews = () => {
+    const el = this.newsSliderRef.current; const step = this._newsStep(); if (!el || !step || this._newsBase == null) return;
+    const k = Math.round((el.scrollLeft - this._newsBase) / step);
+    const target = this._newsBase + k * step;
+    this._newsTarget = target;
+    if (Math.abs(el.scrollLeft - target) > 1) el.scrollTo({ left: target, behavior: 'smooth' });
+  };
+  _newsTargetScroll = () => {
+    const el = this.newsSliderRef.current; if (!el || !this._newsLen) return null;
+    const leftCard = el.children[this._newsLen - 1]; if (!leftCard || !leftCard.offsetWidth) return null;
+    const boundaryPos = leftCard.offsetLeft + leftCard.offsetWidth + 14;
+    return boundaryPos + el.getBoundingClientRect().left - window.innerWidth / 2;
+  };
+  _centerNews = () => {
+    const el = this.newsSliderRef.current; const want = this._newsTargetScroll();
+    if (!el || want == null) return false;
+    el.scrollLeft = want;
+    this._newsBase = el.scrollLeft;
+    this._newsTarget = el.scrollLeft;
+    this._measureNavBtns();
+    return Math.abs(el.scrollLeft - want) <= 1;
+  };
+  _ensureNewsCentered = (tries) => {
+    const el = this.newsSliderRef.current;
+    if (!el) return;
+    const ok = this._centerNews();
+    if (ok) { this._centeredEl = el; return; }
+    if ((tries || 0) < 20) requestAnimationFrame(() => this._ensureNewsCentered((tries || 0) + 1));
+  };
+  _measureNavBtns = () => {
+    const el = this.newsSliderRef.current; if (!el || !this._newsLen) return;
+    const midCard = el.children[this._newsLen];
+    const nextCard = el.children[this._newsLen + 1];
+    if (midCard && nextCard) {
+      // Button pair mirrors the card grid: gap == card gap, right edge flush with slider,
+      // inner edges land exactly on the card gap to the right of centre.
+      const gap = nextCard.offsetLeft - (midCard.offsetLeft + midCard.offsetWidth);
+      const w = el.clientWidth - (nextCard.offsetLeft - el.scrollLeft);
+      const wS = w.toFixed(2) + 'px', gS = gap.toFixed(2) + 'px';
+      if (w > 40 && (wS !== this.state.navBtnW || gS !== this.state.navBtnGap)) this.setState({ navBtnW: wS, navBtnGap: gS });
+    }
+  };
+
+  componentDidMount() {
+    this._onHash = () => {
+      const h = (window.location.hash || '').replace(/^#/, '') || '/';
+      this.setState({ route: h.startsWith('/') ? h : '/', mega: false, burger: false });
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener('hashchange', this._onHash);
+    this._onHash();
+
+    const measure = () => {
+      const el = this.headerRef.current; if (!el) return;
+      const row = el;
+      const h = Math.round((row ? row.getBoundingClientRect().height : 76) + 1);
+      if (h && h !== this.state.headerH) this.setState({ headerH: h });
+    };
+    this._onResize = () => {
+      if (window.innerWidth !== this.state.vw) this.setState({ vw: window.innerWidth, burger: false });
+      measure();
+    };
+    window.addEventListener('resize', this._onResize);
+    this._ro = new ResizeObserver(measure);
+    if (this.headerRef.current) this._ro.observe(this.headerRef.current);
+    measure();
+
+    this._onScroll = () => {
+      const s = window.scrollY > 4;
+      if (s !== this.state.scrolled) this.setState({ scrolled: s });
+    };
+    window.addEventListener('scroll', this._onScroll, { passive: true });
+    this._onScroll();
+
+    if (this.newsSliderRef.current) {
+      const el = this.newsSliderRef.current;
+      el.addEventListener('scroll', this._onNewsScroll, { passive: true });
+      this._newsBound = el;
+    }
+    this._onNewsResize = () => this._centerNews();
+    window.addEventListener('resize', this._onNewsResize);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => this._ensureNewsCentered(0));
+    this._ensureNewsCentered(0);
+    if (this.newsSliderRef.current && window.ResizeObserver) {
+      this._nro = new ResizeObserver(() => this._measureNavBtns());
+      this._nro.observe(this.newsSliderRef.current);
+      const c0 = this.newsSliderRef.current.children[0];
+      if (c0) this._nro.observe(c0);
+    }
+  }
+  componentDidUpdate() {
+    const el = this.newsSliderRef.current;
+    if (el && this._newsBound !== el) {
+      if (this._newsBound) this._newsBound.removeEventListener('scroll', this._onNewsScroll);
+      el.addEventListener('scroll', this._onNewsScroll, { passive: true });
+      this._newsBound = el;
+    }
+    if (el && this._centeredEl !== el && this._newsLen && el.children.length >= this._newsLen * 3) {
+      this._ensureNewsCentered(0);
+    }
+    if (!el) { this._centeredEl = null; }
+  }
+  componentWillUnmount() {
+    window.removeEventListener('hashchange', this._onHash);
+    if (this._ro) this._ro.disconnect();
+    if (this._nro) this._nro.disconnect();
+    window.removeEventListener('resize', this._onResize);
+    window.removeEventListener('scroll', this._onScroll);
+    if (this._newsBound) this._newsBound.removeEventListener('scroll', this._onNewsScroll);
+    clearTimeout(this._newsSnapT);
+    window.removeEventListener('resize', this._onNewsResize);
+  }
+
+  nav(href) {
+    if (window.location.hash.replace(/^#/, '') === href) { this.setState({ mega: false, burger: false }); return; }
+    window.location.hash = href;
+    this.setState({ route: href, mega: false, burger: false, sent: false, formError: '' });
+    window.scrollTo(0, 0);
+  }
+
+  get insts() {
+    return [
+      { slug: 'poradnia-1', type: 'poradnia', name: 'Poradnia 1', tag: '[tag]',
+        addr: '[adres]', city: '[miasto]', tel: '[telefon]', mail: '[e-mail]', hours: '[godziny]',
+        short: '[paragraf 2] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [paragraf 2]', lead: '[paragraf 1] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. [paragraf 1]' },
+      { slug: 'poradnia-2', type: 'poradnia', name: 'Poradnia 2', tag: '[tag]',
+        addr: '[adres]', city: '[miasto]', tel: '[telefon]', mail: '[e-mail]', hours: '[godziny]',
+        short: '[paragraf 2] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [paragraf 2]', lead: '[paragraf 1] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. [paragraf 1]' },
+      { slug: 'oddzial-1', type: 'oddzial', name: 'Oddział 1', tag: '[tag]',
+        addr: '[adres]', city: '[miasto]', tel: '[telefon]', mail: '[e-mail]', hours: '[godziny]',
+        short: '[paragraf 2] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [paragraf 2]', lead: '[paragraf 1] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. [paragraf 1]' },
+      { slug: 'oddzial-2', type: 'oddzial', name: 'Oddział 2', tag: '[tag]',
+        addr: '[adres]', city: '[miasto]', tel: '[telefon]', mail: '[e-mail]', hours: '[godziny]',
+        short: '[paragraf 2] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [paragraf 2]', lead: '[paragraf 1] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. [paragraf 1]' }
+    ];
+  }
+
+  subsFor(type) {
+    return type === 'poradnia'
+      ? [['aktualnosci', 'Aktualności'], ['zespol', 'Zespół'], ['zgloszenia', 'Zgłoszenia'], ['cennik', 'Cennik'], ['kontakt', 'Kontakt']]
+      : [['aktualnosci', 'Aktualności'], ['zespol', 'Zespół'], ['kontakt', 'Kontakt']];
+  }
+
+  decorate(i) {
+    const base = '/' + (i.type === 'poradnia' ? 'poradnie' : 'oddzialy') + '/' + i.slug;
+    const cta = i.type === 'poradnia'
+      ? { ctaHref: base + '/zgloszenia', ctaLabel: 'Poradnia CTA' }
+      : { ctaHref: base + '/kontakt', ctaLabel: 'Oddział CTA' };
+    return Object.assign({}, i, cta, {
+      href: base,
+      contactHref: base + '/kontakt',
+      newsHref: base + '/aktualnosci',
+      subs: this.subsFor(i.type).map(s => ({ label: s[1], href: base + '/' + s[0] }))
+    });
+  }
+
+  onInput = (e) => {
+    const t = e.target; if (!t || !t.name) return;
+    this.setState(s => ({ form: Object.assign({}, s.form, { [t.name]: t.value }), formError: '' }));
+  };
+
+  submitForm = (e) => {
+    e.preventDefault();
+    const f = this.state.form;
+    if (!f.name || !f.name.trim()) return this.setState({ formError: 'Podaj imię i nazwisko opiekuna.' });
+    if (!f.email || !/.+@.+\..+/.test(f.email)) return this.setState({ formError: 'Podaj poprawny adres e-mail.' });
+    this.setState({ sent: true, formError: '' });
+  };
+
+  resetForm = () => this.setState({ sent: false, form: {}, formError: '' });
+
+  onClick = (e) => {
+    const a = e.target.closest && e.target.closest('[data-href]');
+    if (a) { e.preventDefault(); this.nav(a.getAttribute('data-href')); return; }
+    const f = e.target.closest && e.target.closest('[data-filter]');
+    if (f) { e.preventDefault(); this.setState({ filter: f.getAttribute('data-filter') }); return; }
+    if ((this.state.mega || this.state.burger) && !(e.target.closest && e.target.closest('header'))) this.setState({ mega: false, burger: false });
+  };
+
+  toggleMega = (e) => { e.stopPropagation(); this.setState(s => ({ mega: !s.mega, burger: false })); };
+  toggleBurger = (e) => { e.stopPropagation(); this.setState(s => ({ burger: !s.burger, mega: false })); };
+
+  renderVals() {
+    const route = this.state.route || '/';
+    const parts = route.split('/').filter(Boolean);
+    const all = this.insts.map(i => this.decorate(i));
+    const poradnie = all.filter(i => i.type === 'poradnia');
+    const oddzialy = all.filter(i => i.type === 'oddzial');
+
+    const startData = [
+      { num: '01', tab: 'Hasło CTA 1', kicker: '[nadtytuł 1]', title: 'Nagłówek 2 — 01', body: '[paragraf 2 — 01] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. [paragraf 2 — 01]', cta: 'Zgłoszenia CTA', href: '/poradnie/poradnia-1/zgloszenia' },
+      { num: '02', tab: 'Hasło CTA 2', kicker: '[nadtytuł 2]', title: 'Nagłówek 2 — 02', body: '[paragraf 2 — 02] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. [paragraf 2 — 02]', cta: 'Oddziały CTA', href: '/oddzialy' },
+      { num: '03', tab: 'Hasło CTA 3', kicker: '[nadtytuł 3]', title: 'Nagłówek 2 — 03', body: '[paragraf 2 — 03] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. [paragraf 2 — 03]', cta: 'Poradnia CTA', href: '/poradnie/poradnia-2' },
+      { num: '04', tab: 'Hasło CTA 4', kicker: '[nadtytuł 4]', title: 'Nagłówek 2 — 04', body: '[paragraf 2 — 04] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. [paragraf 2 — 04]', cta: 'Kontakt CTA', href: '/kontakt' }
+    ];
+    const startIdx = (this.state.startIdx || 0) % startData.length;
+    const iStartIdx = (this.state.instStartIdx || 0) % startData.length;
+    const iSp = startData[iStartIdx];
+    const sp = startData[startIdx];
+
+    const placIdx = all.length ? (this.state.placIdx || 0) % all.length : 0;
+    const pl = all[placIdx];
+
+    const listRoot = parts[0];
+    const isInstBranch = (listRoot === 'poradnie' || listRoot === 'oddzialy') && parts.length >= 2;
+    const inst = isInstBranch ? all.find(i => i.slug === parts[1]) : null;
+    const sub = inst && parts[2] ? parts[2] : null;
+    const parentPages = ['historia', 'zespol', 'aktualnosci', 'portal-pracownika', 'kontakt', 'polityka-prywatnosci'];
+
+    const navSrc = inst
+      ? this.subsFor(inst.type).map(s => ({ label: s[1], href: inst.href + '/' + s[0], on: sub === s[0] }))
+      : [
+          { label: 'Historia', href: '/historia', on: route === '/historia' },
+          { label: 'Zespół', href: '/zespol', on: route === '/zespol' },
+          { label: 'Aktualności', href: '/aktualnosci', on: route === '/aktualnosci' },
+          { label: 'Portal pracownika', href: '/portal-pracownika', on: route === '/portal-pracownika' },
+          { label: 'Kontakt', href: '/kontakt', on: route === '/kontakt' }
+        ];
+    const onTransparent = route === '/' && !this.state.scrolled && !this.state.mega && !this.state.burger;
+    const navItems = navSrc.map(n => ({ label: n.label, href: n.href, fg: onTransparent ? (n.on ? '#FFFFFF' : '#E4E1DC') : (n.on ? '#101010' : '#4A4742'), rule: n.on ? (onTransparent ? '#FFFFFF' : '#101010') : 'transparent' }));
+
+    const labels = { historia: 'Historia', zespol: 'Zespół', aktualnosci: 'Aktualności', 'portal-pracownika': 'Portal pracownika', kontakt: 'Kontakt', 'polityka-prywatnosci': 'Polityka prywatności', poradnie: 'Poradnie', oddzialy: 'Oddziały', zgloszenia: 'Zgłoszenia', cennik: 'Cennik', 'mapa-ia': 'Mapa IA', 'szablon-sekcji': 'Szablon sekcji' };
+    const crumbs = [{ label: 'Effatha', href: '/', fg: '#8A8681' }];
+    if (parts[0]) crumbs.push({ label: '/', href: route, fg: '#C4C0B9' }, { label: labels[parts[0]] || parts[0], href: '/' + parts[0], fg: parts.length === 1 ? '#101010' : '#8A8681' });
+    if (inst) crumbs.push({ label: '/', href: route, fg: '#C4C0B9' }, { label: inst.name, href: inst.href, fg: sub ? '#8A8681' : '#101010' });
+    if (sub) crumbs.push({ label: '/', href: route, fg: '#C4C0B9' }, { label: labels[sub] || sub, href: route, fg: '#101010' });
+
+    const news = [
+      { date: '[data]', title: 'Nagłówek 3 · wpis 1', lead: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. [paragraf 3]', source: 'Oddział 1', tag: 'oddzialy', href: '/aktualnosci' },
+      { date: '[data]', title: 'Nagłówek 3 · wpis 2', lead: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. [paragraf 3]', source: 'Poradnia 1', tag: 'poradnie', href: '/aktualnosci' },
+      { date: '[data]', title: 'Nagłówek 3 · wpis 3', lead: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. [paragraf 3]', source: 'Effatha', tag: 'effatha', href: '/aktualnosci' },
+      { date: '[data]', title: 'Nagłówek 3 · wpis 4', lead: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. [paragraf 3]', source: 'Oddział 2', tag: 'oddzialy', href: '/aktualnosci' },
+      { date: '[data]', title: 'Nagłówek 3 · wpis 5', lead: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. [paragraf 3]', source: 'Poradnia 2', tag: 'poradnie', href: '/aktualnosci' },
+      { date: '[data]', title: 'Nagłówek 3 · wpis 6', lead: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. [paragraf 3]', source: 'Effatha', tag: 'effatha', href: '/aktualnosci' }
+    ];
+    const newsLoop = [...news, ...news, ...news];
+    this._newsLen = news.length;
+    const _G = 28, _cardW = Math.min(620, Math.max(300, this.state.vw * 0.38));
+    const navBtnW = this.state.navBtnW || (Math.max(64, Math.round(this.state.vw / 2 - 1.5 * _G - _cardW)) + 'px');
+    const navBtnGap = this.state.navBtnGap || (_G + 'px');
+    const filter = this.state.filter;
+    const filterDefs = [['all', 'Wszystkie'], ['effatha', 'Effatha'], ['poradnie', 'Poradnie'], ['oddzialy', 'Oddziały']];
+    const newsFilters = filterDefs.map((f, n) => ({ key: f[0], label: f[1], fg: filter === f[0] ? '#101010' : '#8A8681', divider: n === 0 ? '0' : '1px solid #DEDBD6' }));
+
+    const teamNames = [
+      ['Imię i nazwisko 1', '[funkcja]'], ['Imię i nazwisko 2', '[funkcja]'],
+      ['Imię i nazwisko 3', '[funkcja]'], ['Imię i nazwisko 4', '[funkcja]'],
+      ['Imię i nazwisko 5', '[funkcja]'], ['Imię i nazwisko 6', '[funkcja]'],
+      ['Imię i nazwisko 7', '[funkcja]'], ['Imię i nazwisko 8', '[funkcja]']
+    ].map(t => ({ name: t[0], role: t[1] }));
+
+    const instLabels = all.map(i => i.name);
+
+    const konList = [{ name: 'Effatha', kicker: 'Sekretariat główny', addr: '[adres], [miasto]', tel: '[telefon]', mail: '[e-mail]', hours: '[godziny]', href: '', linkLabel: '' }]
+      .concat(all.map(i => ({
+        name: i.name,
+        kicker: i.type === 'poradnia' ? 'Poradnia' : 'Oddział',
+        addr: i.addr + ', ' + i.city,
+        tel: i.tel, mail: i.mail, hours: i.hours,
+        href: i.contactHref, linkLabel: 'Strona kontaktowa placówki'
+      })));
+    const konIdx = Math.min(this.state.konIdx || 0, konList.length - 1);
+    const kon = konList[konIdx];
+    const teamAll = teamNames.map((m, i) => ({ ...m, inst: instLabels[i % instLabels.length] }));
+    const zesFilter = this.state.zesFilter || 'all';
+    const zesPool = zesFilter === 'all' ? teamAll : teamAll.filter(m => m.inst === zesFilter);
+    const zesPIdx = zesPool.length ? (this.state.zesPIdx || 0) % zesPool.length : 0;
+    const zp = zesPool[zesPIdx] || teamAll[0];
+
+    const izInst = inst ? inst.name : '';
+    const izPool = teamAll.filter(m => m.inst === izInst);
+    const izIdx = izPool.length ? (this.state.instZesIdx || 0) % izPool.length : 0;
+    const iz = izPool[izIdx] || teamAll[0];
+
+    const zglScopes = all.filter(i => i.type === 'poradnia').map(i => i.name);
+    const zglInstIdx = (this.state.zglInstIdx || 0) % Math.max(zglScopes.length, 1);
+    const zglScopeIdx = inst && inst.type === 'poradnia'
+      ? Math.max(0, all.filter(i => i.type === 'poradnia').findIndex(i => i.slug === inst.slug))
+      : zglInstIdx;
+    const zglTopics = [1, 2, 3, 4].map(n => 'Temat zgłoszenia ' + (zglScopeIdx * 4 + n));
+    const zglIdx = (this.state.zglIdx || 0) % zglTopics.length;
+
+    const zesList = teamNames.slice(0, 5);
+    const zesIdx = (this.state.zesIdx || 0) % zesList.length;
+    const zm = zesList[zesIdx];
+
+    const inInstitution = !!inst;
+    const f = inInstitution ? inst : null;
+
+    const iaTree = [
+      ['Effatha — strona główna', 'autyzm.krakow.pl', 'Parent · 1 szt.', 0, 1],
+      ['Historia', '/historia', 'Parent', 1, 0],
+      ['Zespół', '/zespol', 'Parent', 1, 0],
+      ['Aktualności', '/aktualnosci', 'Parent', 1, 0],
+      ['Portal pracownika', '/portal-pracownika', 'Parent · zamknięty', 1, 0],
+      ['Kontakt', '/kontakt', 'Parent · też w stopce', 1, 0],
+      ['Polityka prywatności', '/polityka-prywatnosci', 'Parent · stopka', 1, 0],
+      ['Poradnie — lista', '/poradnie', 'Taksonomia · 1 szt.', 1, 1],
+      ['{nazwa_poradni}', '/poradnie/{slug}', 'Child · powielany', 2, 0],
+      ['Aktualności · Zespół · Zgłoszenia · Cennik · Kontakt', '/poradnie/{slug}/{sekcja}', 'Child · 5 sekcji + N', 3, 0],
+      ['Oddziały — lista', '/oddzialy', 'Taksonomia · 1 szt.', 1, 1],
+      ['{nazwa_oddzialu}', '/oddzialy/{slug}', 'Child · powielany', 2, 0],
+      ['Aktualności · Zespół · Kontakt', '/oddzialy/{slug}/{sekcja}', 'Child · 3 sekcje + N', 3, 0]
+    ].map(n => ({
+      label: n[0], url: n[1], kind: n[2],
+      indent: (n[3] * 32) + 'px',
+      font: n[4] ? '500 19px/1.4 Archivo' : '400 16px/1.4 Archivo',
+      fg: n[3] === 0 ? '#101010' : (n[3] >= 3 ? '#6E6B67' : '#101010')
+    }));
+
+    return {
+      headerRef: this.headerRef,
+      heroMinH: '100vh',
+      heroPadTop: (this.state.headerH + 40) + 'px',
+      mainPadTop: route === '/' ? '0px' : this.state.headerH + 'px',
+      headerBg: onTransparent ? 'transparent' : 'rgba(250,249,247,0.94)',
+      headerBlur: onTransparent ? 'none' : 'blur(8px)',
+      headerBorder: onTransparent ? 'transparent' : '#DEDBD6',
+      logoFg: '#6E6B67', logoBorder: '#C2BDB5',
+      placowkiFg: this.state.mega ? '#FAF9F7' : '#101010', placowkiBorder: '#DEDBD6',
+      burgerFgT: onTransparent ? '#FFFFFF' : '#101010', burgerBorderT: onTransparent ? 'rgba(255,255,255,0.55)' : '#DEDBD6',
+      annotate: this.props.showAnnotations !== false && route !== '/',
+      url: 'autyzm.krakow.pl' + (route === '/' ? '' : route),
+      pageType: inst ? (sub ? 'Child · podstrona placówki (powielana)' : 'Child · strona placówki (powielana)') : (parts.length ? 'Parent · podstrona (niepowielana)' : 'Parent · strona główna'),
+
+      onClick: this.onClick, toggleMega: this.toggleMega, toggleBurger: this.toggleBurger,
+      wideNav: this.state.vw >= 1100, narrowNav: this.state.vw < 1100,
+      showBadge: inInstitution && this.state.vw >= 620,
+      burger: this.state.burger && this.state.vw < 1100,
+      burgerBg: this.state.burger ? '#101010' : 'transparent',
+      burgerFg: this.state.burger ? '#FAF9F7' : '#101010',
+      megaCols: this.state.vw < 700 ? '1fr' : '1fr 1fr',
+      megaPad1: this.state.vw < 700 ? '28px 20px 24px' : '36px 48px 40px 40px',
+      megaPad2: this.state.vw < 700 ? '28px 20px 32px' : '36px 40px 40px 48px',
+      megaDiv: this.state.vw < 700 ? '1px solid #DEDBD6' : 'none',
+      megaDivL: this.state.vw < 700 ? 'none' : '1px solid #DEDBD6',
+      mega: this.state.mega, megaBg: this.state.mega ? '#101010' : 'transparent',
+      megaCaret: this.state.mega ? 'rotate(180deg)' : 'none',
+
+      navItems, crumbs, showCrumbs: parts.length > 0,
+      inInstitution, instName: f ? f.name : '', instHref: f ? f.href : '/',
+      instKind: f ? (f.type === 'poradnia' ? 'Poradnia' : 'Oddział') : '',
+      instTag: f ? f.tag : '', instLead: f ? f.lead : '',
+      instAddr: f ? f.addr + ', ' + f.city : '', instTel: f ? f.tel : '', instMail: f ? f.mail : '', instHours: f ? f.hours : '',
+      instContactHref: f ? f.contactHref : '/kontakt', instNewsHref: f ? f.newsHref : '/aktualnosci',
+      hasHeaderCta: inInstitution, ctaHref: f ? f.ctaHref : '/poradnie', ctaLabel: f ? f.ctaLabel : '',
+
+      poradnie, oddzialy, allInst: all, instCount: all.length,
+
+      placCat: pl ? (pl.type === 'poradnia' ? 'Poradnia' : 'Oddział') : '',
+      placName: pl ? pl.name : '', placDesc: pl ? pl.short : '',
+      placAddr: pl ? pl.addr : '', placCity: pl ? pl.city : '',
+      placHref: pl ? pl.href : '/poradnie',
+      placSegs: all.map((it, n) => ({
+        label: it.name, bg: n === placIdx ? '#101010' : '#DEDBD6',
+        onClick: () => this.setState({ placIdx: n })
+      })),
+      nextPlac: () => this.setState({ placIdx: (placIdx + 1) % all.length }),
+
+      zesName: zm.name, zesRole: zm.role,
+      zesSegs: zesList.map((m, n) => ({
+        label: m.name, bg: n === zesIdx ? '#101010' : '#DEDBD6',
+        onClick: () => this.setState({ zesIdx: n })
+      })),
+      nextZes: () => this.setState({ zesIdx: (zesIdx + 1) % zesList.length }),
+
+      zesPName: zp.name, zesPRole: zp.role, zesPInst: zp.inst,
+      zesFilters: [['all', 'Wszystkie placówki']].concat(instLabels.map(n => [n, n])).map((f, n) => ({
+        label: f[1],
+        fg: zesFilter === f[0] ? '#101010' : '#8A8681',
+        divider: n === 0 ? '0' : '1px solid #DEDBD6',
+        onClick: () => this.setState({ zesFilter: f[0], zesPIdx: 0 })
+      })),
+      konFilters: konList.map((k, n) => ({
+        label: k.name,
+        fg: n === konIdx ? '#101010' : '#8A8681',
+        divider: n === 0 ? '0' : '1px solid #DEDBD6',
+        onClick: () => this.setState({ konIdx: n })
+      })),
+      konKicker: kon.kicker, konName: kon.name, konAddr: kon.addr,
+      konTel: kon.tel, konMail: kon.mail, konHours: kon.hours,
+      konHref: kon.href, konLinkLabel: kon.linkLabel, konLinkDisp: kon.href ? 'inline' : 'none',
+
+      instZesInst: izInst, instZesName: iz.name, instZesRole: iz.role,
+      instZesSegs: izPool.map((m, n) => ({
+        label: m.name, bg: n === izIdx ? '#101010' : '#DEDBD6',
+        onClick: () => this.setState({ instZesIdx: n })
+      })),
+      nextInstZes: () => this.setState({ instZesIdx: izPool.length ? (izIdx + 1) % izPool.length : 0 }),
+
+      zglScope: zglScopes[zglInstIdx],
+      zglInstTabs: zglScopes.map((t, n) => ({
+        label: t,
+        fg: n === zglInstIdx ? '#101010' : '#8A8681',
+        divider: n === 0 ? '0' : '1px solid #DEDBD6',
+        onClick: () => this.setState({ zglInstIdx: n, zglIdx: 0 })
+      })),
+      showZglNav: !inst,
+      megaBtnMl: inst ? 'auto' : 'clamp(0px, 0.3vw, 4px)',
+      zglNavFg: route === '/zgloszenia' ? '#101010' : '#4A4742',
+      zglNavRule: route === '/zgloszenia' ? '#101010' : 'transparent',
+      zglLabel: zglTopics[zglIdx],
+      zglTabs: zglTopics.map((t, n) => ({
+        label: t,
+        fg: n === zglIdx ? '#101010' : '#8A8681',
+        divider: n === 0 ? '0' : '1px solid #DEDBD6',
+        onClick: () => this.setState({ zglIdx: n })
+      })),
+
+      zesPSegs: zesPool.map((m, n) => ({
+        label: m.name, bg: n === zesPIdx ? '#101010' : '#DEDBD6',
+        onClick: () => this.setState({ zesPIdx: n })
+      })),
+      nextZesP: () => this.setState({ zesPIdx: zesPool.length ? (zesPIdx + 1) % zesPool.length : 0 }),
+
+      timelinePanels: this.timeline.map((t, n) => {
+        const open = this.state.histIdx === n;
+        return {
+          year: t.year, title: t.title, body: t.body,
+          open, expanded: open ? 'true' : 'false', rot: '90deg', iconOp: open ? '0' : '1',
+          cols: open ? '1fr 50vw' : '1fr', mr: open ? 'calc(50% - 50vw)' : '0px',
+          toggle: () => this.setState({ histIdx: open ? -1 : n })
+        };
+      }),
+
+
+      pHome: route === '/',
+      pHistoria: route === '/historia', pZespol: route === '/zespol', pAktualnosci: route === '/aktualnosci',
+      pPortal: route === '/portal-pracownika', pKontakt: route === '/kontakt', pZgloszenia: route === '/zgloszenia', pPolityka: route === '/polityka-prywatnosci',
+      pList: (listRoot === 'poradnie' || listRoot === 'oddzialy') && parts.length === 1,
+      pInst: !!inst && !sub,
+      pInstAktualnosci: !!inst && sub === 'aktualnosci',
+      pInstZespol: !!inst && sub === 'zespol',
+      pInstKontakt: !!inst && sub === 'kontakt',
+      pInstZgloszenia: !!inst && sub === 'zgloszenia',
+      pInstCennik: !!inst && sub === 'cennik',
+      pMapa: route === '/mapa-ia', pSzablon: route === '/szablon-sekcji',
+
+      listTitle: listRoot === 'poradnie' ? 'Poradnie' : 'Oddziały',
+      listLead: '[paragraf 1] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. [paragraf 1]',
+      listItems: listRoot === 'poradnie' ? poradnie : oddzialy,
+
+      instStartKicker: iSp.kicker, instStartTitle: iSp.title, instStartBody: iSp.body,
+      instStartCta: (f && f.type === 'poradnia' ? 'Poradnia' : 'Oddział') + ' CTA',
+      instStartTabs: startData.map((it, n) => ({
+        num: it.num, label: it.tab,
+        bc: n === iStartIdx ? '#C8931E' : '#DEDBD6',
+        bg: n === iStartIdx ? '#F1EFEB' : 'transparent',
+        fg: n === iStartIdx ? '#101010' : '#35322E',
+        onClick: () => this.setState({ instStartIdx: n })
+      })),
+
+      startKicker: sp.kicker, startTitle: sp.title, startBody: sp.body, startCta: sp.cta, startHref: sp.href,
+      startLineDisp: this.state.vw >= 860 ? 'block' : 'none',
+      startTabs: startData.map((it, n) => ({
+        num: it.num, label: it.tab,
+        bc: n === startIdx ? '#101010' : '#DEDBD6',
+        bg: n === startIdx ? '#F2F0EC' : 'transparent',
+        fg: n === startIdx ? '#101010' : '#35322E',
+        onClick: () => this.setState({ startIdx: n })
+      })),
+
+      paths: [
+        { num: '01', title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit. [paragraf 3]', cta: 'Zgłoszenia CTA', href: '/poradnie/poradnia-1/zgloszenia' },
+        { num: '02', title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit. [paragraf 3]', cta: 'Oddziały CTA', href: '/oddzialy' },
+        { num: '03', title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit. [paragraf 3]', cta: 'Poradnia CTA', href: '/poradnie/poradnia-2' }
+      ],
+
+      newsSliderRef: this.newsSliderRef, scrollNewsPrev: this.scrollNewsPrev, scrollNewsNext: this.scrollNewsNext,
+      newsHome: news, newsLoop, navBtnW, navBtnGap,
+      newsList: filter === 'all' ? news : news.filter(n => n.tag === filter),
+      newsFilters,
+      instNews: news.slice(0, 4),
+
+      team: teamNames, instTeam: teamNames.slice(0, 6),
+
+
+      portalItems: [
+        { title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit. [paragraf 3]' },
+        { title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit. [paragraf 3]' },
+        { title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit. [paragraf 3]' },
+        { title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit. [paragraf 3]' }
+      ],
+
+      policy: [
+        { title: '1. Nagłówek 3', body: '[paragraf 2] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [paragraf 2]' },
+        { title: '2. Nagłówek 3', body: '[paragraf 2] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [paragraf 2]' },
+        { title: '3. Nagłówek 3', body: '[paragraf 2] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [paragraf 2]' },
+        { title: '4. Nagłówek 3', body: '[paragraf 2] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. [paragraf 2]' }
+      ],
+
+      instFacts: f ? [
+        { label: 'Adres', value: f.addr + ', ' + f.city },
+        { label: 'Godziny', value: f.hours },
+        { label: 'Telefon', value: f.tel },
+        { label: 'Finansowanie', value: f.tag }
+      ] : [],
+      instContactRows: f ? [
+        { label: 'Adres', value: f.addr + ', ' + f.city },
+        { label: 'Telefon', value: f.tel },
+        { label: 'E-mail', value: f.mail },
+        { label: 'Godziny pracy', value: f.hours },
+        { label: 'Dojazd', value: '[dojazd]' }
+      ] : [],
+      instServices: [
+        { title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit. [paragraf 3]' },
+        { title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit. [paragraf 3]' },
+        { title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit. [paragraf 3]' }
+      ],
+
+      intakeSteps: [
+        { num: '01', title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit. [paragraf 3]' },
+        { num: '02', title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit. [paragraf 3]' },
+        { num: '03', title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit. [paragraf 3]' },
+        { num: '04', title: 'Nagłówek 3', body: '[paragraf 3] Lorem ipsum dolor sit amet, consectetur adipiscing elit. [paragraf 3]' }
+      ],
+      sent: this.state.sent, notSent: !this.state.sent, formError: this.state.formError,
+      ticket: 'ZG/' + String(1000 + Math.floor(Math.random() * 8999)),
+      onInput: this.onInput, submitForm: this.submitForm, resetForm: this.resetForm,
+
+      prices: [
+        { name: 'Usługa 1', scope: '[zakres]', price: '000 zł' },
+        { name: 'Usługa 2', scope: '[zakres]', price: '000 zł' },
+        { name: 'Usługa 3', scope: '[zakres]', price: '000 zł' },
+        { name: 'Usługa 4', scope: '[zakres]', price: '000 zł' },
+        { name: 'Usługa 5', scope: '[zakres]', price: '000 zł' },
+        { name: 'Usługa 6', scope: '[zakres]', price: '000 zł' }
+      ],
+
+      iaTree,
+      iaRules: [
+        { title: 'Rodzic nie jest powielany', body: 'Strona główna Effathy i jej podstrony istnieją w jednym egzemplarzu. Redaktor edytuje treść, ale nie tworzy kolejnych kopii.' },
+        { title: 'Placówka to jedna gałąź', body: 'Utworzenie placówki wymaga wyboru typu (poradnia lub oddział) i nazwy. System generuje adres oraz komplet podstron właściwy dla typu.' },
+        { title: 'Sekcje są rozszerzalne', body: 'Zestaw podstron placówki to minimum, nie limit. Nowa sekcja pojawia się automatycznie w nawigacji placówki i w okruszkach.' }
+      ],
+      blockSpecs: [
+        { name: 'Nagłówek sekcji', body: 'Tytuł i akapit wprowadzający. Ten sam układ we wszystkich podstronach placówki — dzięki temu nowe sekcje wyglądają jak natywne.', fields: 'tytuł, lead' },
+        { name: 'Treść', body: 'Dowolna kompozycja: tekst, lista, tabela, galeria, pliki do pobrania. Redaktor wybiera układ z gotowego zestawu.', fields: 'typ układu, treść, załączniki' },
+        { name: 'Kontakt sekcji (opcjonalny)', body: 'Osobne dane kontaktowe dla tej sekcji, jeśli różnią się od danych placówki.', fields: 'osoba, telefon, e-mail' },
+        { name: 'CTA', body: 'Przycisk kierujący do zgłoszenia, kontaktu lub innej podstrony w obrębie tej samej placówki.', fields: 'etykieta, cel' }
+      ],
+
+      footerContactLabel: inInstitution ? 'Kontakt placówki' : 'Kontakt',
+      footerAddr: '[adres], [miasto]',
+      footerTel: '[telefon]',
+      footerMail: '[e-mail]',
+      footerHours: '[godziny]'
+    };
+  }
+}
+</script>
+</body>
+</html>
